@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/*
+  Extracted from gdata-scala
+  Modified by Richard Searle
+*/
+
    
 package com.google.xml.combinators
 
