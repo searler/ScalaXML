@@ -16,8 +16,9 @@
 
 package com.google.xml.combinators
 
-import scala.xml.{Node, Elem, MetaData, NamespaceBinding, Text, ProcInstr, 
-                  Comment, TopScope, Null, XML}
+
+import org.w3c.dom._
+
 
 /**
  * This class represents the input of picklers. It keeps around XML attributes,
@@ -37,11 +38,7 @@ import scala.xml.{Node, Elem, MetaData, NamespaceBinding, Text, ProcInstr,
  * @author Iulian Dragos
  */
 trait XmlInputStore extends XmlStore {
-  /**
-   * If 'true', comments, spaces and processing instructions are skipped when
-   * accepting nodes. 
-   */
-  def skipNonElements: Boolean
+ 
 
   /** 
    * The nesting level of randomAccessMode calls. The level is equal to the number of
@@ -60,17 +57,17 @@ trait XmlInputStore extends XmlStore {
    * (order does not matter). Returns a Seq[Node], since attributes may contain text nodes 
    * interspersed with entity references.
    */
-  def acceptAttr(label: String, uri: String): (Option[Seq[Node]], XmlInputStore)
+  def acceptAttr(label: String, uri: String): (Option[Node], XmlInputStore)
 
   /**
    * Accept the given unprefixed attribute, or fail. Succeeds when the given attribute exists
    * (order does not matter). Returns a Seq[Node], since attributes may contain text nodes 
    * interspersed with entity references.
    */
-  def acceptAttr(label: String): (Option[Seq[Node]], XmlInputStore)
+  def acceptAttr(label: String): (Option[Node], XmlInputStore)
   
   /** Accept a text node. Fails if the head of the node list is not a text node. */
-  def acceptText: (Option[Text], XmlInputStore)
+  def acceptText: (Option[Node], XmlInputStore)
 
   /**
    * Enter random access mode. If the random access level is greater than 0, we try to reuse
@@ -79,9 +76,9 @@ trait XmlInputStore extends XmlStore {
    */
   def randomAccessMode: XmlInputStore = {
     if (randomAccessLevel > 0)
-      mkState(attrs, nodes, ns, randomAccessLevel + 1)
+      mkState(attrs, nodes,  randomAccessLevel + 1)
     else
-      new RandomAccessStore(attrs, nodes, ns, 1)
+      new RandomAccessStore(attrs, nodes,  1)
   }
   
   /**
@@ -93,19 +90,18 @@ trait XmlInputStore extends XmlStore {
     if (randomAccessLevel == 0) 
       this
     else if (randomAccessLevel == 1)
-      LinearStore(attrs, nodes, ns)
+      LinearStore(attrs, nodes)
     else {
-      mkState(attrs, nodes, ns, randomAccessLevel - 1)
+      mkState(attrs, nodes,  randomAccessLevel - 1)
     }
   }
   
   /** Create a new xml store with the given data. Preserves the current randomAccessLevel */
-  protected[combinators] def mkState(attrs: MetaData, nodes: Seq[Node],
-      ns: NamespaceBinding): XmlInputStore =
-    mkState(attrs, nodes, ns, randomAccessLevel)
+  protected[combinators] def mkState(attrs: NamedNodeMap, nodes: Seq[Node]): XmlInputStore =
+    mkState(attrs, nodes,  randomAccessLevel)
   
   /** Implementers should create a new instance of their class, given the Xml store data. */
-  protected def mkState(attrs: MetaData, nodes: Seq[Node], 
-      ns: NamespaceBinding, level: Int): XmlInputStore
+  protected def mkState(attrs: NamedNodeMap, nodes: Seq[Node], 
+     level: Int): XmlInputStore
 }
 

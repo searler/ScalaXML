@@ -43,20 +43,20 @@ class PicklerPermuteTest extends PicklerAsserts {
 
   "testPermute2Unpickle" in {
     val perm1 = 
-      <p:set2 xmlns:p="testing-uri">
+      """<p:set2 xmlns:p="testing-uri">
         <p:a>alfa</p:a>
         <p:b>omega</p:b>
-      </p:set2>
+      </p:set2>"""
     assertSucceedsWith("Permutation of 2 failed unpickling",
         pair, perm1, pPermute2)
   }
   
   "testPermute2Unpickle1" in {
     val perm1 = 
-      <p:set2 xmlns:p="testing-uri">
+      """<p:set2 xmlns:p="testing-uri">
         <p:b>omega</p:b>
         <p:a>alfa</p:a>
-      </p:set2>
+      </p:set2>"""
     assertSucceedsWith("Permutation of 2 failed unpickling",
         pair, perm1, pPermute2)
   }
@@ -69,66 +69,66 @@ class PicklerPermuteTest extends PicklerAsserts {
             
   "testPermute3UnpickleAbc" in {
     val perm1 = 
-      <p:set3 xmlns:p="testing-uri">
+      """<p:set3 xmlns:p="testing-uri">
         <p:a>alfa</p:a>
         <p:b>beta</p:b>
         <p:c>gamma</p:c>
-      </p:set3>
+      </p:set3>"""
     assertSucceedsWith("Permutation of 2 failed unpickling",
         triple, perm1, pPermute3)
   }
 
   "testPermute3UnpickleAcb" in {
     val perm1 = 
-      <p:set3 xmlns:p="testing-uri">
+      """<p:set3 xmlns:p="testing-uri">
         <p:a>alfa</p:a>
         <p:c>gamma</p:c>
         <p:b>beta</p:b>
-      </p:set3>
+      </p:set3>"""
     assertSucceedsWith("Permutation of 3 failed unpickling",
         triple, perm1,  pPermute3)
   }
 
   "testPermute3UnpickleBac" in {
     val perm1 = 
-      <p:set3 xmlns:p="testing-uri">
+      """<p:set3 xmlns:p="testing-uri">
         <p:b>beta</p:b>
         <p:a>alfa</p:a>
         <p:c>gamma</p:c>
-      </p:set3>
+      </p:set3>"""
     assertSucceedsWith("Permutation of 2 failed unpickling",
         triple, perm1,  pPermute3)
   }
   
   "testPermute3UnpickleBca" in {
     val perm1 = 
-      <p:set3 xmlns:p="testing-uri">
+      """<p:set3 xmlns:p="testing-uri">
         <p:b>beta</p:b>
         <p:c>gamma</p:c>
         <p:a>alfa</p:a>
-      </p:set3>
+      </p:set3>"""
     assertSucceedsWith("Permutation of 2 failed unpickling",
         triple, perm1, pPermute3)
   }
   
   "testPermute3UnpickleCab" in {
     val perm1 = 
-      <p:set3 xmlns:p="testing-uri">
+      """<p:set3 xmlns:p="testing-uri">
         <p:c>gamma</p:c>
         <p:a>alfa</p:a>
         <p:b>beta</p:b>
-      </p:set3>
+      </p:set3>"""
     assertSucceedsWith("Permutation of 2 failed unpickling",
         triple, perm1, pPermute3)
   }
 
   "testPermute3UnpickleCba" in {
     val perm1 = 
-      <p:set3 xmlns:p="testing-uri">
+      """<p:set3 xmlns:p="testing-uri">
         <p:c>gamma</p:c>
         <p:b>beta</p:b>
         <p:a>alfa</p:a>
-      </p:set3>
+      </p:set3>"""
     assertSucceedsWith("Permutation of 2 failed unpickling",
         triple, perm1, pPermute3)
   }
@@ -145,17 +145,18 @@ class PicklerPermuteTest extends PicklerAsserts {
   
   "testSeqPermutePickleUnpickle" in {
     val input = 
-      <p:elems xmlns:p="testing-uri">
-        <p:d>d</p:d>
-        <p:inner>
-          <p:a>a</p:a>
-          <p:b>b</p:b>
-          <p:c>c</p:c>
-        </p:inner>
-        <p:e>e</p:e>
-      </p:elems>
+      """<p:elems xmlns:p="testing-uri">
+<p:d>d</p:d>
+<p:inner>
+<p:a>a</p:a>
+<p:b>b</p:b>
+<p:c>c</p:c>
+</p:inner>
+<p:e>e</p:e>
+</p:elems>
+"""
       
-    val pickled = pDPermuteE.pickle(obj, PlainOutputStore.empty).rootNode
+    val pickled = pDPermuteE.pickle(obj, PlainOutputStore.empty).document
      normalize(input) must beEqualTo( normalize(pickled))
     assertSucceedsWith("Sequence and permutation failed unpickling",
         obj, input, pDPermuteE)
@@ -163,7 +164,7 @@ class PicklerPermuteTest extends PicklerAsserts {
 
   "testSeqPermuteUnpickleCab" in {
     val input = 
-      <p:elems xmlns:p="testing-uri">
+      """<p:elems xmlns:p="testing-uri">
         <p:d>d</p:d>
         <p:inner>
           <p:c>c</p:c>
@@ -171,7 +172,7 @@ class PicklerPermuteTest extends PicklerAsserts {
           <p:b>b</p:b>
         </p:inner>
         <p:e>e</p:e>
-      </p:elems>
+      </p:elems>"""
       
     assertSucceedsWith("Sequence and permutation failed unpickling",
         obj, input, pDPermuteE)
@@ -179,7 +180,7 @@ class PicklerPermuteTest extends PicklerAsserts {
 
   "testSeqPermuteUnpickleCabExtra" in {
     val input = 
-      <p:elems xmlns:p="testing-uri">
+      """<p:elems xmlns:p="testing-uri">
         <p:d>d</p:d>
         <p:inner>
           <p:c>c</p:c>
@@ -188,7 +189,7 @@ class PicklerPermuteTest extends PicklerAsserts {
         </p:inner>
         <p:e>e</p:e>
         <extra>This tag should be ignored</extra>
-      </p:elems>
+      </p:elems>"""
       
     assertSucceedsWith("Sequence and permutation with unknown elements failed unpickling",
         obj, input, pDPermuteE)
@@ -197,11 +198,11 @@ class PicklerPermuteTest extends PicklerAsserts {
   "testNesting" in  {
     val p1 = interleaved("set3", interleaved(elem("a", text)) ~ elem("b", text) ~ elem("c", text))
     val input = 
-      <p:set3 xmlns:p="testing-uri">
+      """<p:set3 xmlns:p="testing-uri">
         <p:a>alfa</p:a>
         <p:c>gamma</p:c>
         <p:b>beta</p:b>
-      </p:set3>
+      </p:set3>"""
 
     assertSucceedsWith("Nested interleaved", triple, input, p1)
   }

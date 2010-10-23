@@ -1,7 +1,13 @@
 package com.google.xml.combinators
 
-import scala.xml._
+
 import scala.collection._
+
+
+
+import org.w3c.dom._
+
+import javax.xml.parsers.{DocumentBuilderFactory,DocumentBuilder}
 
 /**
  * An XML store used during pickling. It provides methods for adding
@@ -11,106 +17,95 @@ import scala.collection._
  * 
  * @author Iulian Dragos
  */
-trait XmlOutputStore extends XmlStore {
+trait XmlOutputStore{
+  
+
   /** Return a new XmlStore with a new attribute prepended to the list of attrs */
-  def addAttribute(pre: String, key: String, value: String): XmlOutputStore
+  def addAttribute(pre: String, uri:String, key: String, value: String): XmlOutputStore
   
   /** Return a new XmlStore with an unprefixed attribute appended to the list of attrs. */
   def addAttribute(key: String, value: String): XmlOutputStore
    
-  /**
-   * Return a new LinearStore with a new namespace binding. If the 
-   * prefix is already defined to the given URI, it returns the 
-   * current object.
-   */
-  def addNamespace(pre: String, uri: String): XmlOutputStore
+  def text:String
 
   /** Add a text node */
-  def addText(s: String): XmlOutputStore =
-    addNode(Text(s))
+  def addText(s: String): XmlOutputStore 
 
   def addNodes(ns: Seq[Node]): XmlOutputStore =
-    ns.foldLeft(this) (_.addNode(_))
+//    ns.foldLeft(this) (_.addNode(_))
+  this
   
   /** Add a node. */
-  def addNode(n: Node): XmlOutputStore
+  def addNode(prefix: String, uri:String,label: String): XmlOutputStore
 
   /** Add an entire XmlStore to this store. */
   def addStore(other: XmlStore): XmlOutputStore
 
-  /**
-   * Return the root element of the constructed XML fragment. 
-   * It always returns the first node in the list of nodes. It
-   * throws an error if there are top-level attributes.
-   */
-  def rootNode: Elem
+  def document:Document
 }
 
 /**
  * A PlainOutputStore implements XmlOutputStore with reasonable efficiency. It
  * is a mutable representation.
  */
-class PlainOutputStore(var attrs: MetaData, nods: Seq[Node], 
-                       var ns: NamespaceBinding) extends XmlOutputStore {
+class PlainOutputStore(val node:Node) extends XmlOutputStore {
 
-  private val nodeBuf = new mutable.ListBuffer[Node]
-  
-  def nodes: Seq[Node] = nodeBuf.readOnly
+  def document = node match {
+        case d:Document => d
+        case _  => node getOwnerDocument
+   }
+   def element = node.asInstanceOf[Element]
+
+/** Add a text node */
+  def addText(s: String): XmlOutputStore = {
+    node.setTextContent(s)
+    this
+  }
   
   /** Return a new LinearStore with a prefixed attribute prepended to the list of attrs */
-  def addAttribute(pre: String, key: String, value: String): XmlOutputStore = {
-    attrs = new PrefixedAttribute(pre, key, value, attrs)
+  def addAttribute(pre: String, uri:String,key: String, value: String): XmlOutputStore = {
+    element.setAttributeNS(uri,pre+":"+key,value)
     this
   }
 
   /** Return a new LinearStore with an unprefixed attribute prepended to the list of attrs */
   def addAttribute(key: String, value: String): XmlOutputStore = {
-    attrs = new UnprefixedAttribute(key, value, attrs)
+    element.setAttribute(key,value)
     this
   }
     
-  def addNamespace(pre: String, uri: String): XmlOutputStore = 
-    if (ns.getURI(pre) == uri) 
-      this 
-    else {
-      ns = new NamespaceBinding(pre, uri, ns)
-      this
-    }
+  def text:String = document.toString + node.toString
 
-  def addNode(n: Node) = {
-    nodeBuf += n
-    this
+  
+
+  def addNode(prefix: String, uri:String, label: String) = {
+   
+    val e = document.createElementNS(uri, prefix+":"+label)
+    node.appendChild(e)
+    new PlainOutputStore(e)
+   
   }
   
-  /**
-   * Return the first element of the pickled document. Throws MalformedXmlStore if
-   * the first node is not an Elem or if there are attributes not assigned to
-   * an element.
-   */
-  def rootNode: Elem = {
-    val root = nodeBuf(0)
-    if (attrs.isEmpty && root.isInstanceOf[Elem]) {
-      root.asInstanceOf[Elem]
-    } else
-      throw new MalformedXmlStore("Top-level attributes found hanging: " + attrs, this)
-  }
+ 
 
   /** Add an entire XmlStore to this store. */
   def addStore(other: XmlStore): XmlOutputStore = {
-    val newAttrs = attrs 
-    other.attrs.foreach(attrs.append(_))
-    nodeBuf ++= other.nodes
+   // val newAttrs = attrs 
+  //  other.attrs.foreach(attrs.append(_)) ##
+  
     this
   } 
 }
 
 /** Factory for output stores. */
 object PlainOutputStore {
+
+   val builder = DocumentBuilderFactory.newInstance.newDocumentBuilder 
   /** An empty output store. */
-  def empty: PlainOutputStore = new PlainOutputStore(Null, Nil, TopScope)
+  def empty: PlainOutputStore = new PlainOutputStore(builder.newDocument)
   
   /** An output store with a given namespace binding. */
-  def apply(ns: NamespaceBinding) = new PlainOutputStore(Null, Nil, ns)
+  def apply() = empty
 }
 
 /** An exception thrown when the XML output store is inconsistent. */

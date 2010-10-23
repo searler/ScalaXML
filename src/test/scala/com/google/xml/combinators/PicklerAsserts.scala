@@ -22,7 +22,7 @@ package com.google.xml.combinators;
 
 import org.specs._
 
-import scala.xml.{Node, Utility, Elem}
+import org.w3c.dom._
 
 /**
  * This trait defines specialized asserts for testing picklers.
@@ -32,8 +32,8 @@ import scala.xml.{Node, Utility, Elem}
 trait PicklerAsserts extends Specification {
   import Picklers._
    
-  def assertSucceedsWith[A](name: String, expected: A, in: Elem, pa: Pickler[A]) {
-    val result = pa.unpickle(LinearStore.fromElem(in))
+  def assertSucceedsWith[A](name: String, expected: A, in: String, pa: Pickler[A]) {
+    val result = pa.unpickle(LinearStore.fromString(in))
     result match {
       case Success(v, _) =>  expected aka name must beEqualTo( v)
       case f: NoSuccess  =>  fail(f.toString)
@@ -42,12 +42,22 @@ trait PicklerAsserts extends Specification {
   
   /** Test that the value 'v' pickles to the expected xml node. */
   def assertPicklesTo[A](name: String, expected: Node, v: A, pa: Pickler[A]) {
-     Utility.trim(expected) aka name must beEqualTo(Utility.trim(pa.pickle(v, PlainOutputStore.empty).rootNode))
+     val p = pa.pickle(v, PlainOutputStore.empty)
+     expected aka name must beEqualTo(p.document)
   }
   
   /**
    * Return a string representation without unnecessary white-space.
    * Useful when comparing XML documents.
    */
-  def normalize(n: Node): String = Utility.trim(n).toString
+  def normalize(n: Node): String = {
+     val writer = new java.io.StringWriter
+     val transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer(); 
+     transformer.setOutputProperty(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION,"yes")
+ transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT,"yes")
+     transformer.transform(new javax.xml.transform.dom.DOMSource(n),new javax.xml.transform.stream.StreamResult(writer))
+     writer.toString
+  }
+
+  def normalize(s:String) = s
 }

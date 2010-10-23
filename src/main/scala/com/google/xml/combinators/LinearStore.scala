@@ -16,11 +16,16 @@
 
 package com.google.xml.combinators
 
-import java.io.{InputStream, InputStreamReader, FileInputStream}
+import java.io.{Reader,  StringReader}
+import org.xml.sax.InputSource
 
-import scala.xml.{Node, Elem, MetaData, NamespaceBinding, Text, ProcInstr, 
-                  Comment, TopScope, Null, XML, parsing, EntityRef, Utility, Atom}
 import scala.io.Source
+
+
+import org.w3c.dom._
+
+import javax.xml.parsers._
+
 
 /**
  * This class encapsulate the state carried around
@@ -31,41 +36,32 @@ import scala.io.Source
  *
  * @author Iulian Dragos (iuliandragos@google.com)
  */
-class LinearStore(ats: MetaData, nods: List[Node], bindings: NamespaceBinding) 
+class LinearStore(ats: NamedNodeMap, nods: List[Node]) 
     extends XmlInputStore {
   def attrs = ats
   def nodes = nods
-  def ns    = bindings
-  var skipNonElements = true
+ 
   
-  /** 
-   * Set whitespace handling when looking for elements. Defaults to skipping whitespace, 
-   * comments and processing instructions.
-   */
-  def setSkipNonElements(v: Boolean): this.type = {
-    skipNonElements = v
-    this
-  }
-  
+ 
   /**
    * Skips whitespace from the list of nodes. Whitespace is considered to be: empty (only
    * space) text nodes, comments and processing instructions. 
    */
   private def doSkipWhitespace: List[Node] = {
     def isWhiteSpace(n: Node): Boolean = n match {
-      case Text(str) => str.trim.isEmpty
-      case ProcInstr(_, _) | Comment(_) => true
+      case t:Text => t.getTextContent.trim.isEmpty
+      case p:ProcessingInstruction => true
+      case c:Comment=> true
       case _ => false
     }
     
-    if (!skipNonElements) nodes
-    else {
+    
       var n = nodes
       while (n != Nil && isWhiteSpace(n.head)) { 
         n = n.tail
       }
       n
-    }
+    
   }
 
   /**
@@ -73,14 +69,14 @@ class LinearStore(ats: MetaData, nods: List[Node], bindings: NamespaceBinding)
    * list. Comments, processing instructions and white space are skipped if 'skipsWhitespace' is
    * set (default). 
    */
-  def acceptElem(Label: String, uri: String): (Option[Node], XmlInputStore) = {
+  def acceptElem(label: String, uri: String): (Option[Node], XmlInputStore) = {
     val n = doSkipWhitespace
     if (n.isEmpty)
       (None, this)
     else 
       n.head match {
-        case e @ Elem(_, Label, _, scope, _*) if (e.namespace ==  uri) => 
-          (Some(e), mkState(attrs, n.tail, ns))
+        case e:Element  if (e.getNamespaceURI ==  uri && e.getLocalName == label) => 
+          (Some(e), mkState(attrs, n.tail))
         case _ => (None, this)
       }
   }
@@ -90,14 +86,11 @@ class LinearStore(ats: MetaData, nods: List[Node], bindings: NamespaceBinding)
    * (order does not matter). Returns a Seq[Node], since attributes may contain text nodes 
    * interspersed with entity references.
    */
-  def acceptAttr(label: String, uri: String): (Option[Seq[Node]], XmlInputStore) = {
-    if (attrs.isEmpty) 
-      (None, this)
-    else
-      attrs(uri, ns, label) match {
+  def acceptAttr(label: String, uri: String): (Option[Node], XmlInputStore) = {
+      attrs.getNamedItemNS(uri, label) match {
         case null  => (None, this)
         case contents =>
-          (Some(contents), mkState(attrs.remove(uri, ns, label), nodes, ns))
+          (Some(contents), this)
       }
   }
 
@@ -106,54 +99,33 @@ class LinearStore(ats: MetaData, nods: List[Node], bindings: NamespaceBinding)
    * (order does not matter). Returns a Seq[Node], since attributes may contain text nodes 
    * interspersed with entity references.
    */
-  def acceptAttr(label: String): (Option[Seq[Node]], XmlInputStore) = {
-    if (attrs.isEmpty)
-      (None, this)
-    else
-      attrs(label) match {
+  def acceptAttr(label: String): (Option[Node], XmlInputStore) = {
+      attrs.getNamedItem(label) match {
         case null  => (None, this)
         case contents =>
-          (Some(contents), mkState(attrs.remove(label), nodes, ns))
+          (Some(contents), this)
       }
   }
   
   /** Accept a text node. Fails if the head of the node list is not a text node. */
-  def acceptText: (Option[Text], XmlInputStore) = {
+  def acceptText: (Option[Node], XmlInputStore) = {
     if (nodes.isEmpty) 
-      (Some(Text("")), this)
+     (None, this)// (Some(Text("")), this) ### not None??
     else 
-      nodes.head match {
-        case t: Text => (Some(t), mkState(attrs, nodes.tail, ns))
+        (Some(nodes.head), mkState(attrs, nodes.tail))
+      /*nodes.head match {
+        case t: Text => (Some(t.getTextContent), mkState(attrs, nodes.tail))
         case _       => (None, this)
-      }
+      }*/
   }
 
-  protected def mkState(attrs: MetaData, nodes: Seq[Node], ns: NamespaceBinding, level: Int) = 
-    LinearStore(attrs, nodes, ns).setSkipNonElements(true)
+  protected def mkState(attrs: NamedNodeMap, nodes: Seq[Node], level: Int) = 
+    LinearStore(attrs, nodes)
   
   override def toString = 
-    "LinearStore(" + attrs + ", " + nodes.mkString("", ",", "") + ", " + ns + ")"
+    "LinearStore(" + attrs + ", " + nodes.mkString("", ",", "") + ", " 
   
-  /** Return a text node out of the sequence of nodes (which might contain entity references). */
-  private def unescapeText(ns: Seq[Node]) = {
-    def unescape(sb: StringBuilder, ns: Seq[Node]): StringBuilder = ns match {
-      case Seq(Text(txt), nss @ _*) =>
-        sb.append(txt)
-        unescape(sb, nss)
-
-      case Seq(EntityRef(entName), nss @ _*) =>
-        Utility.unescape(entName, sb)
-        unescape(sb, nss)
-
-      case Seq(a: Atom[_], nss @ _*) =>
-        sb.append(a.text)
-        unescape(sb, nss)
-
-      case _ =>
-        sb
-    }
-    unescape(new StringBuilder, ns).toString
-  }
+ 
 }
 
 /**
@@ -162,37 +134,48 @@ class LinearStore(ats: MetaData, nods: List[Node], bindings: NamespaceBinding)
  * @author Iulian Dragos
  */
 object LinearStore {
-  /** Return an empty pickler state. */
-  def empty: LinearStore = 
-    empty(TopScope)
+ 
   
-  /** Return an empty pickler state with a given namespace scope. */
-  def empty(ns: NamespaceBinding) = 
-    LinearStore(Null, Nil, ns)
+  /** Return an empty pickler state  */
+  def empty() = 
+    LinearStore(NullNamedNodeMap, Nil)
 
   /** Create a LinearStore with the given state.*/
-  def apply(attrs: MetaData, nodes: Seq[Node], ns: NamespaceBinding) = 
-    new LinearStore(attrs, nodes.toList, ns)
+  def apply(attrs: NamedNodeMap, nodes: Seq[Node]) = 
+    new LinearStore(attrs, nodes.toList )
   
   def apply(store: XmlStore): XmlInputStore =
-    apply(store.attrs, store.nodes, store.ns)
+    apply(store.attrs, store.nodes)
 
   /** Create a LinearStore from an element. */
-  def fromElem(e: Elem) =
-    LinearStore(e.attributes, List(e), TopScope)
+  def fromElem(e: Element) =
+    LinearStore(e.getAttributes, List(e))
   
-  /** Create a LinearStore from the given InputStream. */
-  def fromInputStream(in: InputStream) = {
-    val e = XML.load(in)
-    fromElem(e)
+  /** Create a LinearStore from the given Reader. */
+  def fromReader(in: Reader) = {
+    val factory = DocumentBuilderFactory.newInstance
+    factory setNamespaceAware true
+    factory setIgnoringComments true
+    factory setIgnoringElementContentWhitespace true
+    val builder = factory.newDocumentBuilder
+    fromElem(builder.parse(new InputSource(in)).getDocumentElement)
   }
   
-  /** Create a LinearStore from the given filename. */
-  def fromFile(f: String) = {
-    fromInputStream(new FileInputStream(f))
+  /** Create a LinearStore from the string. */
+  def fromString(f: String) = {
+    fromReader(new StringReader(f))
   }
 
   /** Create a LinearStore for the contents of the given element. */ 
-  def enterElem(e: Elem) = 
-    LinearStore(e.attributes, e.child.toList, e.scope)
+  def enterElem(e: Element) = 
+    LinearStore(e.getAttributes, makeList(e.getChildNodes))
+
+  private def makeList(l:NodeList):List[Node] = {
+    val buffer = new scala.collection.mutable.ListBuffer[Node]
+    for(i<-0 until l.getLength)
+      buffer += l.item(i)
+    buffer.toList
+  }
+
+  
 }

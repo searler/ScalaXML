@@ -17,8 +17,7 @@
 package com.google.xml.combinators
 
 
-import scala.xml.{Node, Elem, MetaData, NamespaceBinding, Text, ProcInstr, 
-                  Comment, TopScope, Null, XML}
+import org.w3c.dom._
 
 /**
  * This class matches elements at any position in the sequence of nodes. This allows
@@ -31,8 +30,8 @@ import scala.xml.{Node, Elem, MetaData, NamespaceBinding, Text, ProcInstr,
  * 
  * @see com.google.xml.combinators.XmlInputStore
  */
-class RandomAccessStore(myAttrs: MetaData, myNodes: Seq[Node], 
-    myNs: NamespaceBinding, level: Int) extends LinearStore(myAttrs, myNodes.toList, myNs) {
+class RandomAccessStore(myAttrs: NamedNodeMap, myNodes: Seq[Node], 
+    level: Int) extends LinearStore(myAttrs, myNodes.toList) {
   import collection.mutable.{Set, MultiMap}
   import collection.mutable.LinkedHashMap
   
@@ -44,14 +43,15 @@ class RandomAccessStore(myAttrs: MetaData, myNodes: Seq[Node],
 
   /** A holder class that provides proper identity to nodes. @see NodeBuffer.hashCode. */
   private class Entry(val n: Node)
-    
+
   {
     // initialize store by mapping names to elements.
     for (n <- myNodes) 
-      nodeMap.addBinding(n.label, new Entry(n))
+      nodeMap.addBinding(n.getLocalName, new Entry(n))
   }
+
   def this(underlying: XmlInputStore) = 
-    this(underlying.attrs, underlying.nodes, underlying.ns, underlying.randomAccessLevel)
+    this(underlying.attrs, underlying.nodes,  underlying.randomAccessLevel)
   
   /**
    * Lookup the given element, based on label and URI. It uses the node map to efficiently 
@@ -61,7 +61,7 @@ class RandomAccessStore(myAttrs: MetaData, myNodes: Seq[Node],
     for (elems <- nodeMap.get(label);
          entry <- elems)
       entry.n match {
-        case e: Elem if (e.namespace == uri) => 
+        case e: Element if (e.getNamespaceURI == uri) => 
           nodeMap.remove(label)
           return (Some(e), this)
       case _ => ()
@@ -71,7 +71,7 @@ class RandomAccessStore(myAttrs: MetaData, myNodes: Seq[Node],
   
   /** Return the list of nodes. It reads them from the internal map. */
   override def nodes: List[Node] = {
-    val buf = new scala.xml.NodeBuffer
+    val buf = new scala.collection.mutable.ListBuffer[Node]
     for (ns <- nodeMap.values; entry <- ns.iterator) {
       buf += entry.n
     }
@@ -79,37 +79,12 @@ class RandomAccessStore(myAttrs: MetaData, myNodes: Seq[Node],
   }
   
   /** Create a new instance of this class, given the contents of this store. */
-  override protected[combinators] def mkState(attrs: MetaData, nodes: Seq[Node],
-      ns: NamespaceBinding, level: Int) =
-    new RandomAccessStore(attrs, nodes, ns, level)
+  override protected[combinators] def mkState(attrs: NamedNodeMap, nodes: Seq[Node],
+       level: Int) =
+    new RandomAccessStore(attrs, nodes,  level)
     
   override def toString = "RandomAccessStore(" + attrs + ", " + 
-    nodes.mkString("", ",", "") + ", " + ns + ")"
+    nodes.mkString("", ",", "") +  ")"
 }
 
-/**
- * A straight-forward implementation for random access stores. It uses immutable lists
- * and has linear element lookup. Most of the times the default RandomAccessStore is 
- * better.
- * 
- * @author Iulian Dragos
 
-case class ListRandomAccessStore(ats: MetaData, nods: List[Node], bindings: NamespaceBinding,
-    level: Int) 
-    extends LinearStore(ats, nods, bindings) {
-
-  randomAccessLevel = level
-  
-  override def acceptElem(label: String, uri: String): (Option[Node], ListRandomAccessStore) = {
-    val elem = nodes find { n => n.isInstanceOf[Elem] && n.label == label && n.namespace == uri }
-    (elem, if (elem.isEmpty) this 
-        else ListRandomAccessStore(attrs, nodes.remove(_ == elem.get), ns, randomAccessLevel))
-  }
-  
-  override protected def mkState(attrs: MetaData, nodes: Seq[Node], 
-      ns: NamespaceBinding, level: Int) = ListRandomAccessStore(attrs, nodes.toList, ns, level)
-    
-  override def toString = "ListRandomAccessStore(" + attrs + ", " + 
-    nodes.mkString("", ",", "") + ", " + ns + ")"
-}
- */

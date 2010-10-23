@@ -18,8 +18,12 @@ package com.google.xml.combinators
 
 import java.io.{InputStream, InputStreamReader}
 
-import scala.xml.{MetaData, Node, NamespaceBinding}
+
 import scala.collection.mutable.{Buffer, ListBuffer}
+
+import scala.xml.NamespaceBinding
+
+import org.w3c.dom._
 
 /**
  * An interface for XML stores. It keeps around a collection of attributes, elements and 
@@ -31,11 +35,10 @@ import scala.collection.mutable.{Buffer, ListBuffer}
  */
 trait XmlStore {
   /** The current XML attributes. */
-  def attrs: MetaData
+  def attrs: NamedNodeMap
 
   /** The current XML nodes. */
   def nodes: Seq[Node]
-   
-  /** The current namespace bindings. */
-  def ns:    NamespaceBinding
+ 
+
 }

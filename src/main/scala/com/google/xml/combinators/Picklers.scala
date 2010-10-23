@@ -18,8 +18,8 @@ package com.google.xml.combinators
 
 import com.google.gdata.data.util.DateTime
 
-import scala.xml.{Node, Elem, NamespaceBinding, NodeSeq, Null, Text, TopScope}
 import java.text.ParseException
+import org.w3c.dom._
 
 /** 
  * A class for XML Pickling combinators.
@@ -133,7 +133,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
 
     def unpickle(in: St): PicklerResult[String] = {
       in.acceptText match {
-        case (Some(Text(content)), in1) => Success(content, in1)
+        case (Some(content), in1) => Success(content.getTextContent, in1)
         case (None, in1)                => Failure("Text node expected", in1)
       }
     }
@@ -173,32 +173,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     filter(text, parseDouble, String.valueOf(_))
   }
   
-  /**
-   * Pickler for a list of elements. It unpickles a list of elements separated by 'sep'.
-   * It makes little sense to use this pickler on elem or attr picklers (use '~' and 'rep' 
-   * instead.) For an example how this is used, see MediaRss which defines a comma-separated 
-   * list of categories as the contents of an element.
-   * <p/>
-   */
-  def list[A](sep: Char, pa: => Pickler[A]): Pickler[List[A]] = {
-    def parseList(str: String, unused: St): PicklerResult[List[A]] = {
-      val elems = str.split(sep).toList.map(_.trim).reverse
-      
-      elems.foldLeft(Success(Nil, LinearStore.empty): PicklerResult[List[A]]) { (result, e) =>
-        result andThen { (es, in) => pa.unpickle(LinearStore(Null, List(Text(e)), TopScope)) match {
-          case Success(v, in1) => Success(v :: es, in1)
-          case f: NoSuccess => f
-        }}
-      }
-    }
-    
-    def pickleList(es: List[A]): String = {
-      val store = 
-        es.foldLeft(PlainOutputStore.empty: XmlOutputStore) { (in, e) => pa.pickle(e, in) }
-      store.nodes.mkString("", sep.toString, "")
-    }
-    filter(text, parseList, pickleList)
-  } 
+  
 
   /**
    * A pickler for date/time in RFC 3339 format. It handles dates that look like
@@ -214,8 +189,9 @@ object Picklers extends AnyRef with TupleToPairFunctions {
       
     def unpickle(in:St): PicklerResult[DateTime] = 
       in.acceptText match {
-        case (Some(Text(str)), in1) =>
+        case (Some(n:Node), in1) =>
           try {
+            val str = n.getTextContent
             if (allowDateOnly)
               Success(DateTime.parseDateOrDateTime(str), in1)
             else
@@ -291,13 +267,13 @@ object Picklers extends AnyRef with TupleToPairFunctions {
    */
   def attr[A](pre: String, uri: String, key: String, pa: => Pickler[A]) = new Pickler[A] {
     def pickle(v: A, in: XmlOutputStore) = {
-      in.addNamespace(pre, uri).addAttribute(pre, key, pa.pickle(v, emptyStore).nodes.text)
+      in.addAttribute(pre,uri, key, pa.pickle(v, emptyStore).text)
     }
 
     def unpickle(in: St): PicklerResult[A] = {
       in.acceptAttr(key, uri) match {
-        case (Some(nodes), in1) =>
-          pa.unpickle(LinearStore(Null, nodes.toList, in.ns)) andThen { (v, in2) => Success(v, in1) }
+        case (Some(node), in1) =>
+          pa.unpickle(LinearStore(NullNamedNodeMap, List(node))) andThen { (v, in2) => Success(v, in1) }
         case (None, in1) => 
           Failure("Expected attribute " + pre + ":" + key + " in " + uri, in)
       }
@@ -308,13 +284,15 @@ object Picklers extends AnyRef with TupleToPairFunctions {
    * A pickler for unprefixed attributes. Such attributes have no namespace.
    */
   def attr[A](label: String, pa: => Pickler[A]): Pickler[A] = new Pickler[A] {
-    def pickle(v: A, in: XmlOutputStore) = 
-      in.addAttribute(label, pa.pickle(v, emptyStore).nodes.text)
+    def pickle(v: A, in: XmlOutputStore) = {
+    //  in.addAttribute(label, pa.pickle(v, emptyStore).text)
+ in.addAttribute(label, v.toString)
+    }
       
     def unpickle(in: St): PicklerResult[A] = {
       in.acceptAttr(label) match {
-        case (Some(nodes), in1) =>
-          pa.unpickle(LinearStore(Null, nodes.toList, in.ns)) andThen { (v, in2) => Success(v, in1) }
+        case (Some(node), in1) =>
+          pa.unpickle(LinearStore(NullNamedNodeMap, List(node))) andThen { (v, in2) => Success(v, in1) }
         case (None, in1) => 
           Failure("Expected unprefixed attribute " + label, in)
       }
@@ -332,14 +310,14 @@ object Picklers extends AnyRef with TupleToPairFunctions {
   /** Wrap a pickler into an element. */
   def elem[A](pre: String, uri: String, label: String, pa: => Pickler[A]) = new Pickler[A] {
     def pickle(v: A, in: XmlOutputStore): XmlOutputStore = {
-      val ns1 = if (in.ns.getURI(pre) == uri) in.ns else new NamespaceBinding(pre, uri, in.ns)
-      val in1 = pa.pickle(v, PlainOutputStore(ns1))
-      in.addNode(Elem(pre, label, in1.attrs, in1.ns, in1.nodes:_*))
+ 
+      pa.pickle(v, in.addNode(pre, uri,label))
+      in
     }
 
     def unpickle(in: St): PicklerResult[A] = {
       in.acceptElem(label, uri) match {
-        case (Some(e: Elem), in1) => 
+        case (Some(e: Element), in1) => 
           pa.unpickle(LinearStore.enterElem(e)) andThen { (v, in2) =>
             Success(v, in1)
           }
@@ -475,7 +453,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
       var lastFailed: Option[NoSuccess] = None
       
       val target = in.nodes find {
-        case e: Elem => 
+        case e: Element => 
           pa.unpickle(LinearStore.fromElem(e)) match {
             case _: Success[_] => true
             case f: NoSuccess => lastFailed = Some(f); false 
@@ -484,10 +462,10 @@ object Picklers extends AnyRef with TupleToPairFunctions {
       }
       
       target match {
-        case Some(e: Elem) => 
+        case Some(e: Element) => 
           pb.unpickle(LinearStore.fromElem(e)) match {
             case Success(v1, in1) =>
-              Success(v1, in.mkState(in.attrs, in.nodes.toList.filterNot(_ == e), in.ns))
+              Success(v1, in.mkState(in.attrs, in.nodes.toList.filterNot(_ == e)))
             case f: NoSuccess =>
               Failure(f.msg, in)
           }
@@ -524,8 +502,8 @@ object Picklers extends AnyRef with TupleToPairFunctions {
   }
   
   /** An xml pickler that collects all remaining XML nodes. */
-  def xml: Pickler[NodeSeq] = new Pickler[NodeSeq] {
-    def pickle(v: NodeSeq, in: XmlOutputStore) = v.foldLeft(in) (_.addNode(_))
+  def xml: Pickler[Seq[Node]] = new Pickler[Seq[Node]] {
+    def pickle(v: Seq[Node], in: XmlOutputStore) =  in///v.foldLeft(in) (_.addNode(_)) ##
     def unpickle(in: St) = Success(in.nodes, LinearStore.empty)
   }
   
@@ -540,8 +518,9 @@ object Picklers extends AnyRef with TupleToPairFunctions {
   def extend[A <: HasStore, B](pa: => Pickler[A], pb: => Pickler[B]) = new Pickler[A ~ B] {
     def pickle(v: A ~ B, in: XmlOutputStore): XmlOutputStore = {
       val in1 = pb.pickle(v._2, PlainOutputStore.empty)
-      v._1.store = in1
-      pa.pickle(v._1, in)
+//      v._1.store = in1   ########### TODO
+  //    pa.pickle(v._1, in)
+     in1
     }
  
     def unpickle(in: St): PicklerResult[A ~ B] = {
