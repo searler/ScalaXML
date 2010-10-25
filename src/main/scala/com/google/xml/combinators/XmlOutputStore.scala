@@ -1,9 +1,6 @@
 package com.google.xml.combinators
 
-
 import scala.collection._
-
-
 
 import org.w3c.dom._
 
@@ -18,7 +15,6 @@ import javax.xml.parsers.{DocumentBuilderFactory,DocumentBuilder}
  * @author Iulian Dragos
  */
 trait XmlOutputStore{
-  
 
   /** Return a new XmlStore with a new attribute prepended to the list of attrs */
   def addAttribute(pre: String, uri:String, key: String, value: String): XmlOutputStore
@@ -26,20 +22,18 @@ trait XmlOutputStore{
   /** Return a new XmlStore with an unprefixed attribute appended to the list of attrs. */
   def addAttribute(key: String, value: String): XmlOutputStore
    
-  def text:String
-
   /** Add a text node */
   def addText(s: String): XmlOutputStore 
 
-  def addNodes(ns: Seq[Node]): XmlOutputStore =
-//    ns.foldLeft(this) (_.addNode(_))
-  this
   
   /** Add a node. */
-  def addNode(prefix: String, uri:String,label: String): XmlOutputStore
+  def addNode(prefix: String, uri:String, label: String) = {
+    val e = document.createElementNS(uri, prefix+":"+label)
+    addElement(e)
+    new ElementOutputStore(e)
+  }
 
-  /** Add an entire XmlStore to this store. */
-  def addStore(other: XmlStore): XmlOutputStore
+  def addElement(e:Element)
 
   def document:Document
 }
@@ -48,17 +42,14 @@ trait XmlOutputStore{
  * A PlainOutputStore implements XmlOutputStore with reasonable efficiency. It
  * is a mutable representation.
  */
-class PlainOutputStore(val node:Node) extends XmlOutputStore {
+class ElementOutputStore(val element:Element) extends XmlOutputStore {
 
-  def document = node match {
-        case d:Document => d
-        case _  => node getOwnerDocument
-   }
-   def element = node.asInstanceOf[Element]
+  def document =element  getOwnerDocument
+  
 
 /** Add a text node */
   def addText(s: String): XmlOutputStore = {
-    node.setTextContent(s)
+    element.setTextContent(s)
     this
   }
   
@@ -74,39 +65,32 @@ class PlainOutputStore(val node:Node) extends XmlOutputStore {
     this
   }
     
-  def text:String = document.toString + node.toString
-
-  
-
-  def addNode(prefix: String, uri:String, label: String) = {
-   
-    val e = document.createElementNS(uri, prefix+":"+label)
-    node.appendChild(e)
-    new PlainOutputStore(e)
-   
+  def addElement(e:Element) {
+    element.appendChild(e)
   }
-  
- 
+   
+}
 
-  /** Add an entire XmlStore to this store. */
-  def addStore(other: XmlStore): XmlOutputStore = {
-   // val newAttrs = attrs 
-  //  other.attrs.foreach(attrs.append(_)) ##
-  
-    this
-  } 
+/**
+ * A PlainOutputStore implements XmlOutputStore with reasonable efficiency. It
+ * is a mutable representation.
+ */
+class DocumentOutputStore(val document:Document) extends XmlOutputStore {
+  def addText(s: String): XmlOutputStore =  throw new UnsupportedOperationException
+  def addAttribute(pre: String, uri:String,key: String, value: String): XmlOutputStore =  throw new UnsupportedOperationException
+  def addAttribute(key: String, value: String): XmlOutputStore =  throw new UnsupportedOperationException
+
+  def addElement(e:Element) {
+    document.appendChild(e)
+  }
+ 
 }
 
 /** Factory for output stores. */
 object PlainOutputStore {
 
-   val builder = DocumentBuilderFactory.newInstance.newDocumentBuilder 
+  private val builder = DocumentBuilderFactory.newInstance.newDocumentBuilder 
   /** An empty output store. */
-  def empty: PlainOutputStore = new PlainOutputStore(builder.newDocument)
-  
-  /** An output store with a given namespace binding. */
-  def apply() = empty
+  def empty: XmlOutputStore = new DocumentOutputStore(builder.newDocument) 
 }
 
-/** An exception thrown when the XML output store is inconsistent. */
-case class MalformedXmlStore(msg: String, state: XmlOutputStore) extends RuntimeException(msg)

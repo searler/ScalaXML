@@ -267,7 +267,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
    */
   def attr[A](pre: String, uri: String, key: String, pa: => Pickler[A]) = new Pickler[A] {
     def pickle(v: A, in: XmlOutputStore) = {
-      in.addAttribute(pre,uri, key, pa.pickle(v, emptyStore).text)
+      in.addAttribute(pre,uri, key, v.toString)
     }
 
     def unpickle(in: St): PicklerResult[A] = {
@@ -285,8 +285,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
    */
   def attr[A](label: String, pa: => Pickler[A]): Pickler[A] = new Pickler[A] {
     def pickle(v: A, in: XmlOutputStore) = {
-    //  in.addAttribute(label, pa.pickle(v, emptyStore).text)
- in.addAttribute(label, v.toString)
+       in.addAttribute(label, v.toString)
     }
       
     def unpickle(in: St): PicklerResult[A] = {
@@ -495,55 +494,10 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     wrap(pa) (f) { x => g(x).get }
 
   
-  /** Collect all unconsumed input into a XmlStore. */
-  def collect: Pickler[XmlStore] = new Pickler[XmlStore] {
-    def pickle(v: XmlStore, in: XmlOutputStore) = in.addStore(v)
-    def unpickle(in: St) = Success(in, LinearStore.empty)
-  }
   
-  /** An xml pickler that collects all remaining XML nodes. */
-  def xml: Pickler[Seq[Node]] = new Pickler[Seq[Node]] {
-    def pickle(v: Seq[Node], in: XmlOutputStore) =  in///v.foldLeft(in) (_.addNode(_)) ##
-    def unpickle(in: St) = Success(in.nodes, LinearStore.empty)
-  }
   
-  /** 
-   * Apply 'pb' on the state stored in the value unpickled by 'pa'.
-   * It is used for after-the-fact extension. The type 'A' has to be an instance of HasStore.
-   * The pickler will apply 'pb' on HasStore.store. The assumption is that 'pa' stores in there
-   * the unconsumed input.
-   * 
-   * @see makeExtensible
-   */
-  def extend[A <: HasStore, B](pa: => Pickler[A], pb: => Pickler[B]) = new Pickler[A ~ B] {
-    def pickle(v: A ~ B, in: XmlOutputStore): XmlOutputStore = {
-      val in1 = pb.pickle(v._2, PlainOutputStore.empty)
-//      v._1.store = in1   ########### TODO
-  //    pa.pickle(v._1, in)
-     in1
-    }
- 
-    def unpickle(in: St): PicklerResult[A ~ B] = {
-      pa.unpickle(in) andThen { (a, in1) => 
-        pb.unpickle(LinearStore(a.store)) andThen { (b, in2) =>
-          Success(new ~(a, b), in1)
-        }
-      }
-    }
-  }
   
-  /** 
-   * Make a given pickler store unconsumed input for later use. The given type should 
-   * mix in HasStore. This pickler will store unconsumed input in the HasStore instance. Use
-   * 'extend' to apply another pickler on the stored input.
-   * 
-   * <code>makeExtensible(Person.pickler)</code> will make a Person pickler ready for future 
-   * extensions by keeping around all input left.
-   * 
-   * @see 'exted'.
-   */
-  def makeExtensible[A <: HasStore](pa: => Pickler[A]): Pickler[A] = 
-    wrap (pa ~ collect) { case a ~ ext => a.store = ext; a } { a => new ~ (a, a.store) }
+  
   
   /** A logging combinator */
   def logged[A](name: String, pa: => Pickler[A]): Pickler[A] = new Pickler[A] {
