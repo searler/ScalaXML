@@ -36,8 +36,11 @@ class PicklerTest extends  PicklerAsserts{
   
   final val URI = "testing-uri"
 
-  def pAttr2: Pickler[~[String, String]] = 
+  def pAttr2 = 
     elem("p", URI, "pair" , attr("a",text) ~ attr("b",text) )
+
+def pAttr2URI = 
+    elem("p", URI, "pair" , attr("p", URI,"a",text) ~ attr("p", URI,"b",text) )
        
     
   def pSeq2: Pickler[~[String, String]] = 
@@ -54,9 +57,23 @@ class PicklerTest extends  PicklerAsserts{
   val attrInput =
     """<p:pair a="alfa" b="omega" xmlns:p="testing-uri"/>
 """
+
+val attrInputURI =
+    """<p:pair xmlns:p="testing-uri" p:a="alfa" p:b="omega"/>
+"""
        
 
   val pair = new ~("alfa", "omega")
+
+
+ "testAttrURIUnpickle" in {
+     assertSucceedsWith("Attribute unpickling failed", pair, attrInputURI , pAttr2URI)
+  } 
+
+"testAttrURIPickle" in {
+    val pickled = pAttr2URI.pickle(pair, PlainOutputStore.empty)
+    normalize(attrInputURI) must beEqualTo(normalize(pickled.document))
+  } 
 
  "testAttrUnpickle" in {
      assertSucceedsWith("Attribute unpickling failed", pair, attrInput , pAttr2)
