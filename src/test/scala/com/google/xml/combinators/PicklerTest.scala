@@ -39,18 +39,42 @@ class PicklerTest extends  PicklerAsserts{
   def pAttr2 = 
     elem("p", URI, "pair" , attr("a",text) ~ attr("b",text) )
 
-def pAttr2URI = 
+  def pAttr2URI = 
     elem("p", URI, "pair" , attr("p", URI,"a",text) ~ attr("p", URI,"b",text) )
        
     
-  def pSeq2: Pickler[~[String, String]] = 
+  def pSeq2: Pickler[String ~ String] = 
     elem("p", URI, "pair", 
         elem("p", URI, "a", text) ~ elem("p", URI, "b", text))
+
+  def pSeq2Int: Pickler[String ~ Int] = 
+    elem("p", URI, "pair", 
+        elem("p", URI, "a", text) ~ elem("p", URI, "b", intVal))
+
+ def pSeq2Opt: Pickler[String ~Option[String]] = 
+    elem("p", URI, "pair", 
+        elem("p", URI, "a", text)  ~ opt(elem("p",URI,"b",text)))
+
+ def pSeq2Default: Pickler[String ~ String] = 
+    elem("p", URI, "pair", 
+        elem("p", URI, "a", text)  ~ default(elem("p",URI,"b",text),"omega"))
           
   val input =
     """<p:pair xmlns:p="testing-uri">
 <p:a>alfa</p:a>
 <p:b>omega</p:b>
+</p:pair>
+"""
+
+val inputInt =
+    """<p:pair xmlns:p="testing-uri">
+<p:a>alfa</p:a>
+<p:b>12</p:b>
+</p:pair>
+"""
+val inputOpt =
+    """<p:pair xmlns:p="testing-uri">
+<p:a>alfa</p:a>
 </p:pair>
 """
 
@@ -64,6 +88,11 @@ val attrInputURI =
        
 
   val pair = new ~("alfa", "omega")
+  val pairInt = new ~("alfa", 12)
+  val pairOptNone = new ~("alfa",None)
+  val pairOptSome = new ~("alfa",Some("omega"))
+
+ 
 
 
  "testAttrURIUnpickle" in {
@@ -89,9 +118,34 @@ val attrInputURI =
        normalize(input) must beEqualTo(normalize(pickled.document))
  }
 
-  
-  "testSequenceUnpickle" in  {
+"testSequenceOptSomePickle" in  {
+ val pickled = pSeq2Opt.pickle(pairOptSome, PlainOutputStore.empty)
+       normalize(input) must beEqualTo(normalize(pickled.document))
+ }
+
+"testSequenceOptNonePickle" in  {
+ val pickled = pSeq2Opt.pickle(pairOptNone, PlainOutputStore.empty)
+       normalize(inputOpt) must beEqualTo(normalize(pickled.document))
+ }
+
+"testSequenceUnpickle" in  {
     assertSucceedsWith("Sequence unpickling failed", pair, input, pSeq2)
+  }
+
+"testSequenceUnpickleOptSome" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairOptSome, input, pSeq2Opt)
+  }
+
+"testSequenceUnpickleOptNone" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairOptNone, inputOpt, pSeq2Opt)
+  }
+
+"testSequenceUnpickleDefaultNone" in  {
+    assertSucceedsWith("Sequence unpickling failed", pair, inputOpt, pSeq2Default)
+  }
+  
+  "testSequenceIntUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairInt, inputInt, pSeq2Int)
   }
   
   def pSeq3: Pickler[String ~ String ~ String] =
@@ -100,7 +154,7 @@ val attrInputURI =
       ~ elem("p", URI, "b", text)
       ~ elem("p", URI, "c", text))
       
-  val triple = new ~(new ~("alfa", "beta"), "gamma") 
+  val triple = (new ~("alfa", "beta")) ~ "gamma" 
   val inputTriple =
     """<m:triple xmlns:m="testing-uri">
        <m:a>alfa</m:a>

@@ -73,16 +73,6 @@ trait TupleToPairFunctions {
   implicit def fun3ToPpairR[A, B, C, D](f: (A, B, C) => D): (~[A, ~[B, C]]) => D = { 
     case a ~ (b ~ c) =>  f(a, b, c)
   } 
- /*   
-  implicit def funTuple2ToPair[A, B, C](f: A => (B, C)) = 
-    { x: A => tuple2Pair(f(x)) }
-  implicit def funTuple3ToPair[A, B, C, D](f: A => (B, C, D)) =
-    { x: A => tuple3Pair(f(x)) }
-  implicit def funTuple4ToPair[A, B, C, D, E](f: A => (B, C, D, E)) =
-    { x: A => tuple4Pair(f(x)) }
-  implicit def funTuple5ToPair[A, B, C, D, E, F](f: A => (B, C, D, E, F)) =
-    { x: A => tuple5Pair(f(x)) }
-*/
   
   implicit def tuple2Unapply[ B, C](a: Option[(B, C)]) = 
     Some(new ~(a.get._1, a.get._2))
@@ -96,20 +86,5 @@ trait TupleToPairFunctions {
      implicit def tuple5Unapply[ A,B, C, D, E](a: Option[(A, B, C, D,E)]) = 
     Some(new ~(a.get._1, a.get._2) ~ a.get._3 ~ a.get._4 ~ a.get._5)
   
-  /*
-  implicit def funTuple2ToPairUnapply[A, B, C](f: A => Option[(B, C)]) = 
-    { x: A => tuple2Pair(f(x).get) }
-  implicit def funTuple3ToPairUnapply[A, B, C, D](f: A => Option[(B, C, D)]) = 
-    { x: A => tuple3Pair(f(x).get) }
-  implicit def funTuple4ToPairUnapply[A, B, C, D, E](f: A => Option[(B, C, D, E)]) = 
-    { x: A => tuple4Pair(f(x).get) }
-  implicit def funTuple5ToPairUnapply[A, B, C, D, E, F](f: A => Option[(B, C, D, E, F)]) =
-    { x: A => tuple5Pair(f(x).get) }
- 
   
-  def tuple2Pair[A, B](p: (A, B)) = new ~(p._1, p._2)
-  def tuple3Pair[A, B, C](p: (A, B, C)) = new ~(p._1, p._2) ~ p._3
-  def tuple4Pair[A, B, C, D](p: (A, B, C, D)) = new ~(p._1, p._2) ~ p._3 ~ p._4
-  def tuple5Pair[A, B, C, D, E](p: (A, B, C, D, E)) = new ~(p._1, p._2) ~ p._3 ~ p._4 ~ p._5 
-   */
 }

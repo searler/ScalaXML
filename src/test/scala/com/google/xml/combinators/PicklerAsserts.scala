@@ -54,7 +54,7 @@ trait PicklerAsserts extends Specification {
      val writer = new java.io.StringWriter
      val transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer(); 
      transformer.setOutputProperty(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION,"yes")
- transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT,"yes")
+     transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT,"yes")
      transformer.transform(new javax.xml.transform.dom.DOMSource(n),new javax.xml.transform.stream.StreamResult(writer))
      writer.toString
   }

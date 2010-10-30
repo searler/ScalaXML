@@ -489,11 +489,10 @@ object Picklers extends AnyRef with TupleToPairFunctions {
       }
   }
 
- // Waiting for bug fix in 2.7.0
+
   def wrapCaseClass[A, B](pa: => Pickler[A])(f: A => B)(g: B => Some[A]): Pickler[B] =
     wrap(pa) (f) { x => g(x).get }
 
-  
   
   
   
