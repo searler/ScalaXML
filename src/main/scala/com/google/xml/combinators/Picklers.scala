@@ -309,7 +309,6 @@ object Picklers extends AnyRef with TupleToPairFunctions {
   /** Wrap a pickler into an element. */
   def elem[A](pre: String, uri: String, label: String, pa: => Pickler[A]) = new Pickler[A] {
     def pickle(v: A, in: XmlOutputStore): XmlOutputStore = {
- 
       pa.pickle(v, in.addNode(pre, uri,label))
       in
     }

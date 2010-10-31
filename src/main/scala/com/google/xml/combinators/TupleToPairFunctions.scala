@@ -77,13 +77,13 @@ trait TupleToPairFunctions {
   implicit def tuple2Unapply[ B, C](a: Option[(B, C)]) = 
     Some(new ~(a.get._1, a.get._2))
   
-   implicit def tuple3Unapply[ B, C, D](a: Option[(B, C,D)]) = 
+  implicit def tuple3Unapply[ B, C, D](a: Option[(B, C,D)]) = 
     Some(new ~(a.get._1, a.get._2) ~a.get._3)
    
-    implicit def tuple4Unapply[ A,B, C, D](a: Option[(A, B, C, D)]) = 
+  implicit def tuple4Unapply[ A,B, C, D](a: Option[(A, B, C, D)]) = 
     Some(new ~(a.get._1, a.get._2) ~ a.get._3 ~ a.get._4)
     
-     implicit def tuple5Unapply[ A,B, C, D, E](a: Option[(A, B, C, D,E)]) = 
+  implicit def tuple5Unapply[ A,B, C, D, E](a: Option[(A, B, C, D,E)]) = 
     Some(new ~(a.get._1, a.get._2) ~ a.get._3 ~ a.get._4 ~ a.get._5)
   
   

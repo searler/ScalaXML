@@ -42,7 +42,19 @@ class PicklerTest extends  PicklerAsserts{
   def pAttr2URI = 
     elem("p", URI, "pair" , attr("p", URI,"a",text) ~ attr("p", URI,"b",text) )
        
-    
+  def pNested2: Pickler[String ~ String] = 
+    elem("p", URI, "pair", 
+            elem("p",URI,"n",
+                elem("p", URI, "a", text) ~ elem("p", URI, "b", text)))   
+
+ def pNestedSeq2: Pickler[(String ~ String) ~ (String ~ String)] = 
+    elem("p", URI, "pair", 
+            elem("p",URI,"n",
+                elem("p", URI, "a", text) ~ elem("p", URI, "b", text)) ~ 
+            elem("p",URI,"o",
+                elem("p", URI, "c", text) ~ elem("p", URI, "d", text))
+    )    
+
   def pSeq2: Pickler[String ~ String] = 
     elem("p", URI, "pair", 
         elem("p", URI, "a", text) ~ elem("p", URI, "b", text))
@@ -65,6 +77,29 @@ class PicklerTest extends  PicklerAsserts{
 <p:b>omega</p:b>
 </p:pair>
 """
+
+val inputNested =
+    """<p:pair xmlns:p="testing-uri">
+<p:n>
+<p:a>alfa</p:a>
+<p:b>omega</p:b>
+</p:n>
+</p:pair>
+"""
+
+val inputNestedSeq =
+    """<p:pair xmlns:p="testing-uri">
+<p:n>
+<p:a>alfa</p:a>
+<p:b>omega</p:b>
+</p:n>
+<p:o>
+<p:c>beta</p:c>
+<p:d>phi</p:d>
+</p:o>
+</p:pair>
+"""
+
 
 val inputInt =
     """<p:pair xmlns:p="testing-uri">
@@ -91,6 +126,7 @@ val attrInputURI =
   val pairInt = new ~("alfa", 12)
   val pairOptNone = new ~("alfa",None)
   val pairOptSome = new ~("alfa",Some("omega"))
+  val pairNestedSeq = (new ~("alfa", "omega")) ~ (new ~("beta", "phi"))
 
  
 
@@ -101,6 +137,12 @@ val attrInputURI =
 
 "testAttrURIPickle" in {
     val pickled = pAttr2URI.pickle(pair, PlainOutputStore.empty)
+    normalize(attrInputURI) must beEqualTo(normalize(pickled.document))
+  } 
+
+ "testAttrConvert" in {
+    val unpickled = pSeq2.unpickle(LinearStore.fromString(input)).get
+    val pickled = pAttr2URI.pickle(unpickled, PlainOutputStore.empty)
     normalize(attrInputURI) must beEqualTo(normalize(pickled.document))
   } 
 
@@ -118,6 +160,16 @@ val attrInputURI =
        normalize(input) must beEqualTo(normalize(pickled.document))
  }
 
+ "testNestedPickle" in  {
+ val pickled = pNested2.pickle(pair, PlainOutputStore.empty)
+       normalize(inputNested) must beEqualTo(normalize(pickled.document))
+ }
+
+"testNestedSeqPickle" in  {
+ val pickled = pNestedSeq2.pickle(pairNestedSeq, PlainOutputStore.empty)
+       normalize(inputNestedSeq) must beEqualTo(normalize(pickled.document))
+ }
+
 "testSequenceOptSomePickle" in  {
  val pickled = pSeq2Opt.pickle(pairOptSome, PlainOutputStore.empty)
        normalize(input) must beEqualTo(normalize(pickled.document))
@@ -130,6 +182,14 @@ val attrInputURI =
 
 "testSequenceUnpickle" in  {
     assertSucceedsWith("Sequence unpickling failed", pair, input, pSeq2)
+  }
+
+"testNestedUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pair, inputNested, pNested2)
+  }
+
+"testNestedSeqUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairNestedSeq, inputNestedSeq, pNestedSeq2)
   }
 
 "testSequenceUnpickleOptSome" in  {
