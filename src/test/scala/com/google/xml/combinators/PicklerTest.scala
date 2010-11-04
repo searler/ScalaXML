@@ -37,88 +37,88 @@ class PicklerTest extends  PicklerAsserts{
   final val URI = "testing-uri"
 
   def pAttr2 = 
-    elem("p", URI, "pair" , attr("a",text) ~ attr("b",text) )
+    elem(URI, "pair" , attr("a",text) ~ attr("b",text) )
 
   def pAttr2URI = 
-    elem("p", URI, "pair" , attr("p", URI,"a",text) ~ attr("p", URI,"b",text) )
+    elem(URI, "pair" , attr(URI,"a",text) ~ attr(URI,"b",text) )
        
   def pNested2: Pickler[String ~ String] = 
-    elem("p", URI, "pair", 
-            elem("p",URI,"n",
-                elem("p", URI, "a", text) ~ elem("p", URI, "b", text)))   
+    elem(URI, "pair", 
+            elem(URI,"n",
+                elem(URI, "a", text) ~ elem(URI, "b", text)))   
 
  def pNestedSeq2: Pickler[(String ~ String) ~ (String ~ String)] = 
-    elem("p", URI, "pair", 
-            elem("p",URI,"n",
-                elem("p", URI, "a", text) ~ elem("p", URI, "b", text)) ~ 
-            elem("p",URI,"o",
-                elem("p", URI, "c", text) ~ elem("p", URI, "d", text))
+    elem(URI, "pair", 
+            elem(URI,"n",
+                elem(URI, "a", text) ~ elem(URI, "b", text)) ~ 
+            elem(URI,"o",
+                elem(URI, "c", text) ~ elem(URI, "d", text))
     )    
 
   def pSeq2: Pickler[String ~ String] = 
-    elem("p", URI, "pair", 
-        elem("p", URI, "a", text) ~ elem("p", URI, "b", text))
+    elem(URI, "pair", 
+        elem(URI, "a", text) ~ elem(URI, "b", text))
 
   def pSeq2Int: Pickler[String ~ Int] = 
-    elem("p", URI, "pair", 
-        elem("p", URI, "a", text) ~ elem("p", URI, "b", intVal))
+    elem(URI, "pair", 
+        elem(URI, "a", text) ~ elem(URI, "b", intVal))
 
  def pSeq2Opt: Pickler[String ~Option[String]] = 
-    elem("p", URI, "pair", 
-        elem("p", URI, "a", text)  ~ opt(elem("p",URI,"b",text)))
+    elem(URI, "pair", 
+        elem(URI, "a", text)  ~ opt(elem(URI,"b",text)))
 
  def pSeq2Default: Pickler[String ~ String] = 
-    elem("p", URI, "pair", 
-        elem("p", URI, "a", text)  ~ default(elem("p",URI,"b",text),"omega"))
+    elem(URI, "pair", 
+        elem(URI, "a", text)  ~ default(elem(URI,"b",text),"omega"))
           
   val input =
-    """<p:pair xmlns:p="testing-uri">
-<p:a>alfa</p:a>
-<p:b>omega</p:b>
-</p:pair>
+    """<pair xmlns="testing-uri">
+<a>alfa</a>
+<b>omega</b>
+</pair>
 """
 
 val inputNested =
-    """<p:pair xmlns:p="testing-uri">
-<p:n>
-<p:a>alfa</p:a>
-<p:b>omega</p:b>
-</p:n>
-</p:pair>
+    """<pair xmlns="testing-uri">
+<n>
+<a>alfa</a>
+<b>omega</b>
+</n>
+</pair>
 """
 
 val inputNestedSeq =
-    """<p:pair xmlns:p="testing-uri">
-<p:n>
-<p:a>alfa</p:a>
-<p:b>omega</p:b>
-</p:n>
-<p:o>
-<p:c>beta</p:c>
-<p:d>phi</p:d>
-</p:o>
-</p:pair>
+    """<pair xmlns="testing-uri">
+<n>
+<a>alfa</a>
+<b>omega</b>
+</n>
+<o>
+<c>beta</c>
+<d>phi</d>
+</o>
+</pair>
 """
 
 
 val inputInt =
-    """<p:pair xmlns:p="testing-uri">
-<p:a>alfa</p:a>
-<p:b>12</p:b>
-</p:pair>
+    """<pair xmlns="testing-uri">
+<a>alfa</a>
+<b>12</b>
+</pair>
 """
 val inputOpt =
-    """<p:pair xmlns:p="testing-uri">
-<p:a>alfa</p:a>
-</p:pair>
+    """<pair xmlns="testing-uri">
+<a>alfa</a>
+</pair>
 """
 
   val attrInput =
-    """<p:pair a="alfa" b="omega" xmlns:p="testing-uri"/>
+    """<pair a="alfa" b="omega" xmlns="testing-uri"/>
 """
 
 val attrInputURI =
-    """<p:pair xmlns:p="testing-uri" p:a="alfa" p:b="omega"/>
+    """<pair xmlns:ns0="testing-uri" ns0:a="alfa" xmlns:ns1="testing-uri" ns1:b="omega" xmlns="testing-uri"/>
 """
        
 
@@ -209,10 +209,10 @@ val attrInputURI =
   }
   
   def pSeq3: Pickler[String ~ String ~ String] =
-    elem("p", URI, "triple",
-        elem("p", URI, "a", text)
-      ~ elem("p", URI, "b", text)
-      ~ elem("p", URI, "c", text))
+    elem(URI, "triple",
+        elem(URI, "a", text)
+      ~ elem(URI, "b", text)
+      ~ elem(URI, "c", text))
       
   val triple = (new ~("alfa", "beta")) ~ "gamma" 
   val inputTriple =
@@ -226,7 +226,7 @@ val attrInputURI =
     assertSucceedsWith("Sequence 3 unpickling failed", triple, inputTriple, pSeq3)
   }
 
-  def pStrings = elem("p", URI, "strings", rep(elem("p", URI, "str", text)))
+  def pStrings = elem(URI, "strings", rep(elem(URI, "str", text)))
   "testRepetition0Unpickle" in  {
     val inputRep = """<p:strings xmlns:p="testing-uri"></p:strings>"""
       
@@ -259,7 +259,7 @@ val attrInputURI =
   }
   
   "testRepetition0Pickle" in  {
-    val inputRep = """<p:strings xmlns:p="testing-uri"/>
+    val inputRep = """<strings xmlns="testing-uri"/>
 """
       
     val strings = List()
@@ -269,9 +269,9 @@ val attrInputURI =
 
   "testRepetition1Pickle" in {
     val inputRep = 
-      """<p:strings xmlns:p="testing-uri">
-<p:str>one</p:str>
-</p:strings>
+      """<strings xmlns="testing-uri">
+<str>one</str>
+</strings>
 """
       
     val strings = List("one")
@@ -281,11 +281,11 @@ val attrInputURI =
 
   "testRepetition3Pickle" in {
     val inputRep = 
-      """<p:strings xmlns:p="testing-uri">
-<p:str>one</p:str>
-<p:str>two</p:str>
-<p:str>three</p:str>
-</p:strings>
+      """<strings xmlns="testing-uri">
+<str>one</str>
+<str>two</str>
+<str>three</str>
+</strings>
 """
       
     val strings = List("one", "two", "three")
@@ -294,7 +294,7 @@ val attrInputURI =
   }
   
   "testWhen" in {
-    implicit val ns = ("p", "testing-uri")
+    implicit val ns =  "testing-uri"
     val input =
       """<p:strings xmlns:p="testing-uri">
 <p:str>one</p:str>
@@ -312,7 +312,7 @@ val attrInputURI =
   }
   
   "testWhenInterleaved" in {
-    implicit val ns = ("p", "testing-uri")
+    implicit val ns = "testing-uri"
     val input =
       """<p:strings xmlns:p="testing-uri">
 <p:b>b</p:b>

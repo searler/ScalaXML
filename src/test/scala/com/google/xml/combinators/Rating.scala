@@ -11,14 +11,14 @@ case class Rating(
 }
 
 object Rating {
-  import com.google.gdata.data.Uris.gdNs
+
   import Picklers._
 
   final val URI = "testing-uri"
   def rawPickler  = 
     elem("rating", 
-      elem("name",text)("x",URI)  ~ attr("count", intVal) ~  attr("min", intVal) ~  default(attr("cost", intVal),666) ~ rep(elem("max", intVal)("x",URI))
-        )(gdNs)
+      elem("name",text)(URI)  ~ attr("count", intVal) ~  attr("min", intVal) ~  default(attr("cost", intVal),666) ~ rep(elem("max", intVal)(URI))
+        )("http://schemas.google.com/g/2005")
   
    
 

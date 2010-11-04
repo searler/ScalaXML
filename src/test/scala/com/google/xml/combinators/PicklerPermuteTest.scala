@@ -32,7 +32,7 @@ class PicklerPermuteTest extends PicklerAsserts {
   import Picklers._
   
   final val URI = "testing-uri"
-  implicit val namespace = ("p", URI)
+  implicit val namespace = (URI)
   
   def pPermute2: Pickler[String ~ String] =
     interleaved("set2", elem("a", text) ~ elem("b", text))
@@ -133,27 +133,27 @@ class PicklerPermuteTest extends PicklerAsserts {
         triple, perm1, pPermute3)
   }
 
-  def pa: Pickler[String] = elem("p", URI, "a", text)
-  def pb: Pickler[String] = elem("p", URI, "b", text)
-  def pc: Pickler[String] = elem("p", URI, "c", text)
-  def pd: Pickler[String] = elem("p", URI, "d", text)
-  def pe: Pickler[String] = elem("p", URI, "e", text)
+  def pa: Pickler[String] = elem(URI, "a", text)
+  def pb: Pickler[String] = elem(URI, "b", text)
+  def pc: Pickler[String] = elem(URI, "c", text)
+  def pd: Pickler[String] = elem(URI, "d", text)
+  def pe: Pickler[String] = elem(URI, "e", text)
   
-  def pDPermuteE = elem("p", URI, "elems", pd ~ interleaved("inner", pa ~ pb ~ pc) ~ pe)
+  def pDPermuteE = elem(URI, "elems", pd ~ interleaved("inner", pa ~ pb ~ pc) ~ pe)
   val objAbc = new ~(new ~("a", "b"), "c")
   val obj = new ~(new ~("d", objAbc), "e") 
   
   "testSeqPermutePickleUnpickle" in {
     val input = 
-      """<p:elems xmlns:p="testing-uri">
-<p:d>d</p:d>
-<p:inner>
-<p:a>a</p:a>
-<p:b>b</p:b>
-<p:c>c</p:c>
-</p:inner>
-<p:e>e</p:e>
-</p:elems>
+      """<elems xmlns="testing-uri">
+<d>d</d>
+<inner>
+<a>a</a>
+<b>b</b>
+<c>c</c>
+</inner>
+<e>e</e>
+</elems>
 """
       
     val pickled = pDPermuteE.pickle(obj, PlainOutputStore.empty).document

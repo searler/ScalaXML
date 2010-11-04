@@ -48,10 +48,10 @@ class RatingTest  extends PicklerAsserts{
     
     val out = PlainOutputStore.empty
     val xml=   Rating.pickler.pickle(r,out)
-    """<gd:rating cost="11" count="9" min="12" xmlns:gd="http://schemas.google.com/g/2005">
-<x:name xmlns:x="testing-uri">name</x:name>
-<x:max xmlns:x="testing-uri">12</x:max>
-</gd:rating>
+    """<rating cost="11" count="9" min="12" xmlns="http://schemas.google.com/g/2005">
+<name xmlns="testing-uri">name</name>
+<max xmlns="testing-uri">12</max>
+</rating>
 """ must beEqualTo(normalize(xml.document))
 
   }

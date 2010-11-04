@@ -17,9 +17,9 @@ class NestedTest  extends PicklerAsserts{
      "parse" in {
     val in = """<rating xmlns="http://schemas.google.com/g/2005">
                     <name xmlns="testing-uri">name</name>
-                    <internal xmlns="testing-uri">
-                       <tag xmlns="testing-uri">tagged</tag>
-                       <value xmlns="testing-uri">123</value>
+                    <internal xmlns="nested-uri">
+                       <tag>tagged</tag>
+                       <value>123</value>
                     </internal>
                  </rating>"""
             
@@ -39,14 +39,14 @@ class NestedTest  extends PicklerAsserts{
     
     val out = PlainOutputStore.empty
     val xml=   Nested.pickler.pickle(r,out)
-    """<gd:rating xmlns:gd="http://schemas.google.com/g/2005">
-<x:name xmlns:x="testing-uri">name</x:name>
-<x:internal xmlns:x="testing-uri">
-<x:tag>tagged</x:tag>
-<x:value>123</x:value>
-</x:internal>
-<x:max xmlns:x="testing-uri">12</x:max>
-</gd:rating>
+    """<rating xmlns="http://schemas.google.com/g/2005">
+<name xmlns="testing-uri">name</name>
+<internal xmlns="nested-uri">
+<tag>tagged</tag>
+<value>123</value>
+</internal>
+<max xmlns="testing-uri">12</max>
+</rating>
 """ must beEqualTo(normalize(xml.document))
 
   }

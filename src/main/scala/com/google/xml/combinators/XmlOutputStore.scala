@@ -17,7 +17,7 @@ import javax.xml.parsers.{DocumentBuilderFactory,DocumentBuilder}
 trait XmlOutputStore{
 
   /** Return a new XmlStore with a new attribute prepended to the list of attrs */
-  def addAttribute(pre: String, uri:String, key: String, value: String): XmlOutputStore
+  def addAttribute(uri:String, key: String, value: String): XmlOutputStore
   
   /** Return a new XmlStore with an unprefixed attribute appended to the list of attrs. */
   def addAttribute(key: String, value: String): XmlOutputStore
@@ -27,8 +27,8 @@ trait XmlOutputStore{
 
   
   /** Add a node. */
-  def addNode(prefix: String, uri:String, label: String) = {
-    val e = document.createElementNS(uri, prefix+":"+label)
+  def addNode(uri:String, label: String) = {
+    val e = document.createElementNS(uri, label)
     addElement(e)
     new ElementOutputStore(e)
   }
@@ -54,8 +54,8 @@ class ElementOutputStore(val element:Element) extends XmlOutputStore {
   }
   
   /** Return a new LinearStore with a prefixed attribute prepended to the list of attrs */
-  def addAttribute(pre: String, uri:String,key: String, value: String): XmlOutputStore = {
-    element.setAttributeNS(uri,pre+":"+key,value)
+  def addAttribute(uri:String,key: String, value: String): XmlOutputStore = {
+    element.setAttributeNS(uri,key,value)
     this
   }
 
@@ -77,7 +77,7 @@ class ElementOutputStore(val element:Element) extends XmlOutputStore {
  */
 class DocumentOutputStore(val document:Document) extends XmlOutputStore {
   def addText(s: String): XmlOutputStore =  throw new UnsupportedOperationException
-  def addAttribute(pre: String, uri:String,key: String, value: String): XmlOutputStore =  throw new UnsupportedOperationException
+  def addAttribute(uri:String,key: String, value: String): XmlOutputStore =  throw new UnsupportedOperationException
   def addAttribute(key: String, value: String): XmlOutputStore =  throw new UnsupportedOperationException
 
   def addElement(e:Element) {
