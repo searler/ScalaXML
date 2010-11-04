@@ -16,7 +16,6 @@
 
 package com.google.gdata.data.util
 
-import com.google.util.Utility
 import java.util.{Date, Calendar, GregorianCalendar, TimeZone}
  
 /**
@@ -97,7 +96,7 @@ class DateTime(private[util] var value: Long,
     calendar.setTimeInMillis(value + tzShift)
     
     import Calendar._
-    import Utility.padInt
+   
     
     padInt(sb, calendar.get(YEAR), 4).append('-')
     padInt(sb, calendar.get(MONTH) + 1, 2).append('-')  // Calendar month is 0-based
@@ -205,5 +204,22 @@ object DateTime {
     val dt = apply(year, month, day, 0, 0, 0, None, 0)
     dt.dateOnly = true
     dt
+  }
+
+  /** 
+   * Adds leading zeroes to a given int to fill 'digits', and appends it to the StringBuffer.
+   * Assumes positive integers.
+   */
+  private def padInt(sb: StringBuilder, n: Long, digits: Int): StringBuilder = {
+    val str = n.toString
+    var delta = digits - str.length
+    
+    assert(delta >= 0, "Not enough digits to pad number: " + n + " on " + digits + " digits")
+    
+    while (delta > 0) {
+      sb.append('0')
+      delta = delta - 1
+    }
+    sb.append(str)
   }
 }
