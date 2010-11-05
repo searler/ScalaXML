@@ -273,7 +273,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     def unpickle(in: St): PicklerResult[A] = {
       in.acceptAttr(key, uri) match {
         case (Some(node), in1) =>
-          pa.unpickle(LinearStore(NullNamedNodeMap, List(node))) andThen { (v, in2) => Success(v, in1) }
+          pa.unpickle(LinearStore(List(node))) andThen { (v, in2) => Success(v, in1) }
         case (None, in1) => 
           Failure("Expected attribute " +  key + " in " + uri, in)
       }
@@ -291,7 +291,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     def unpickle(in: St): PicklerResult[A] = {
       in.acceptAttr(label) match {
         case (Some(node), in1) =>
-          pa.unpickle(LinearStore(NullNamedNodeMap, List(node))) andThen { (v, in2) => Success(v, in1) }
+          pa.unpickle(LinearStore( List(node))) andThen { (v, in2) => Success(v, in1) }
         case (None, in1) => 
           Failure("Expected unprefixed attribute " + label, in)
       }

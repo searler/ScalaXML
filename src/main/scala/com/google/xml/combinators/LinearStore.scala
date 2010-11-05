@@ -38,6 +38,9 @@ import javax.xml.parsers._
  */
 class LinearStore(ats: NamedNodeMap, nods: List[Node]) 
     extends XmlInputStore {
+
+  
+
   def attrs = ats
   def nodes = nods
  
@@ -118,6 +121,8 @@ object LinearStore {
   /** Create a LinearStore with the given state.*/
   def apply(attrs: NamedNodeMap, nodes: Seq[Node]) = 
     new LinearStore(attrs, nodes.toList )
+
+  def apply(ns: List[Node]) =  new LinearStore(NullNamedNodeMap ,ns)
   
   def apply(store: XmlStore): XmlInputStore =
     apply(store.attrs, store.nodes)
@@ -157,6 +162,17 @@ object LinearStore {
     }
     buffer.toList
   }
+
+object NullNamedNodeMap extends NamedNodeMap {
+  def getLength:Int  = 0
+  def getNamedItem(name:String) = null
+  def getNamedItemNS(uri:String,local:String) = null
+  def item(index:Int) = null
+  def removeNamedItem(name:String) = null
+  def removeNamedItemNS(uri:String,name:String) = null
+  def setNamedItem(arg:Node) = arg
+  def setNamedItemNS(arg:Node) = arg
+}
 
   
 }
