@@ -89,13 +89,9 @@ class LinearStore(ats: NamedNodeMap, nods: List[Node])
   /** Accept a text node. Fails if the head of the node list is not a text node. */
   def acceptText: (Option[Node], XmlInputStore) = {
     if (nodes.isEmpty) 
-     (None, this)// (Some(Text("")), this) ### not None??
+     (None, this)
     else 
         (Some(nodes.head), mkState(attrs, nodes.tail))
-      /*nodes.head match {
-        case t: Text => (Some(t.getTextContent), mkState(attrs, nodes.tail))
-        case _       => (None, this)
-      }*/
   }
 
   protected def mkState(attrs: NamedNodeMap, nodes: Seq[Node], level: Int) = 
