@@ -153,7 +153,7 @@ object LinearStore {
     for(i<-0 until l.getLength){
       val n = l.item(i)
       n match {
-         case t:Text if t.getTextContent.trim.isEmpty =>  //TODO
+         case t:Text if t.getTextContent.trim.isEmpty => 
          case p:ProcessingInstruction => 
          case c:Comment=> //none expected
          case _ =>  buffer += n
