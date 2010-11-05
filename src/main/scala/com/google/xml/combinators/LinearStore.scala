@@ -43,40 +43,19 @@ class LinearStore(ats: NamedNodeMap, nods: List[Node])
  
   
  
-  /**
-   * Skips whitespace from the list of nodes. Whitespace is considered to be: empty (only
-   * space) text nodes, comments and processing instructions. 
-   */
-  private def doSkipWhitespace: List[Node] = {
-    def isWhiteSpace(n: Node): Boolean = n match {
-      case t:Text => t.getTextContent.trim.isEmpty
-      case p:ProcessingInstruction => true
-      case c:Comment=> true
-      case _ => false
-    }
-    
-    
-      var n = nodes
-      while (n != Nil && isWhiteSpace(n.head)) { 
-        n = n.tail
-      }
-      n
-    
-  }
-
+  
   /**
    * Accept the given element, or fail. Succeeds when the given element is the head of the node
    * list. Comments, processing instructions and white space are skipped if 'skipsWhitespace' is
    * set (default). 
    */
   def acceptElem(label: String, uri:URI): (Option[Node], XmlInputStore) = {
-    val n = doSkipWhitespace
-    if (n.isEmpty)
+    if (nodes.isEmpty)
       (None, this)
     else 
-      n.head match {
+      nodes.head match {
         case e:Element  if (e.getNamespaceURI ==  uri.uri && e.getLocalName == label) => 
-          (Some(e), mkState(attrs, n.tail))
+          (Some(e), mkState(attrs, nodes.tail))
         case _ => (None, this)
       }
   }
@@ -172,8 +151,15 @@ object LinearStore {
 
   private def makeList(l:NodeList):List[Node] = {
     val buffer = new scala.collection.mutable.ListBuffer[Node]
-    for(i<-0 until l.getLength)
-      buffer += l.item(i)
+    for(i<-0 until l.getLength){
+      val n = l.item(i)
+      n match {
+         case t:Text if t.getTextContent.trim.isEmpty =>  //TODO
+         case p:ProcessingInstruction => 
+         case c:Comment=> //none expected
+         case _ =>  buffer += n
+      }
+    }
     buffer.toList
   }
 
