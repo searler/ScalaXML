@@ -35,7 +35,7 @@ class NestedTest  extends PicklerAsserts{
 
 
    "unparse" in {
- val r=  Nested("name",Internal("tagged",123),12::Nil)
+ val r=  Nested("name",Internal("tagged",123),Internal("l1",111)::Nil)
     
     val out = PlainOutputStore.empty
     val xml=   Nested.pickler.pickle(r,out)
@@ -45,7 +45,10 @@ class NestedTest  extends PicklerAsserts{
 <tag>tagged</tag>
 <value>123</value>
 </internal>
-<max xmlns="testing-uri">12</max>
+<internal xmlns="nested-uri">
+<tag>l1</tag>
+<value>111</value>
+</internal>
 </rating>
 """ must beEqualTo(normalize(xml.document))
 
