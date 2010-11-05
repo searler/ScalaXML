@@ -135,7 +135,6 @@ object LinearStore {
     val factory = DocumentBuilderFactory.newInstance
     factory setNamespaceAware true
     factory setIgnoringComments true
-    factory setIgnoringElementContentWhitespace true
     val builder = factory.newDocumentBuilder
     fromElem(builder.parse(new InputSource(in)).getDocumentElement)
   }
