@@ -12,16 +12,16 @@ object Nested {
  
   import Picklers._
 
-  final val URI = "testing-uri"
-  final val NURI = "nested-uri"
+  final val TURI = URI("testing-uri")
+  final val NURI = URI("nested-uri")
 
   def rawInternalPickler = elem("tag",text)(NURI)~elem("value",intVal)(NURI)
   def internalPickler: Pickler[Internal] = wrapCaseClass(rawInternalPickler) (Internal.apply) (Internal.unapply)
 
   def rawPickler  = 
     elem("rating", 
-      elem("name",text)(URI)  ~ elem("internal", internalPickler)(NURI) ~ rep(elem("max", intVal)(URI))
-        )("http://schemas.google.com/g/2005")
+      elem("name",text)(TURI)  ~ elem("internal", internalPickler)(NURI) ~ rep(elem("max", intVal)(TURI))
+	  )(URI("http://schemas.google.com/g/2005"))
   
    
 

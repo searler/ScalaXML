@@ -69,13 +69,13 @@ class LinearStore(ats: NamedNodeMap, nods: List[Node])
    * list. Comments, processing instructions and white space are skipped if 'skipsWhitespace' is
    * set (default). 
    */
-  def acceptElem(label: String, uri: String): (Option[Node], XmlInputStore) = {
+  def acceptElem(label: String, uri:URI): (Option[Node], XmlInputStore) = {
     val n = doSkipWhitespace
     if (n.isEmpty)
       (None, this)
     else 
       n.head match {
-        case e:Element  if (e.getNamespaceURI ==  uri && e.getLocalName == label) => 
+        case e:Element  if (e.getNamespaceURI ==  uri.uri && e.getLocalName == label) => 
           (Some(e), mkState(attrs, n.tail))
         case _ => (None, this)
       }
@@ -86,8 +86,8 @@ class LinearStore(ats: NamedNodeMap, nods: List[Node])
    * (order does not matter). Returns a Seq[Node], since attributes may contain text nodes 
    * interspersed with entity references.
    */
-  def acceptAttr(label: String, uri: String): (Option[Node], XmlInputStore) = {
-      attrs.getNamedItemNS(uri, label) match {
+  def acceptAttr(label: String, uri:URI): (Option[Node], XmlInputStore) = {
+      attrs.getNamedItemNS(uri.uri, label) match {
         case null  => (None, this)
         case contents =>
           (Some(contents), this)

@@ -31,8 +31,8 @@ import org.specs._
 class PicklerPermuteTest extends PicklerAsserts {
   import Picklers._
   
-  final val URI = "testing-uri"
-  implicit val namespace = (URI)
+  final val TURI = URI("testing-uri")
+  implicit val namespace = TURI
   
   def pPermute2: Pickler[String ~ String] =
     interleaved("set2", elem("a", text) ~ elem("b", text))
@@ -133,13 +133,13 @@ class PicklerPermuteTest extends PicklerAsserts {
         triple, perm1, pPermute3)
   }
 
-  def pa: Pickler[String] = elem(URI, "a", text)
-  def pb: Pickler[String] = elem(URI, "b", text)
-  def pc: Pickler[String] = elem(URI, "c", text)
-  def pd: Pickler[String] = elem(URI, "d", text)
-  def pe: Pickler[String] = elem(URI, "e", text)
+  def pa: Pickler[String] = elem(TURI, "a", text)
+  def pb: Pickler[String] = elem(TURI, "b", text)
+  def pc: Pickler[String] = elem(TURI, "c", text)
+  def pd: Pickler[String] = elem(TURI, "d", text)
+  def pe: Pickler[String] = elem(TURI, "e", text)
   
-  def pDPermuteE = elem(URI, "elems", pd ~ interleaved("inner", pa ~ pb ~ pc) ~ pe)
+  def pDPermuteE = elem(TURI, "elems", pd ~ interleaved("inner", pa ~ pb ~ pc) ~ pe)
   val objAbc = new ~(new ~("a", "b"), "c")
   val obj = new ~(new ~("d", objAbc), "e") 
   

@@ -50,14 +50,14 @@ trait XmlInputStore extends XmlStore {
    * Accept the given element, or fail. Succeeds when the given element is the head of the node
    * list. Comments, processing instructions and entity references might. 
    */
-  def acceptElem(Label: String, uri: String): (Option[Node], XmlInputStore)
+  def acceptElem(Label: String, uri:URI): (Option[Node], XmlInputStore)
 
   /**
    * Accept the given prefixed attribute, or fail. Succeeds when the given attribute exists
    * (order does not matter). Returns a Seq[Node], since attributes may contain text nodes 
    * interspersed with entity references.
    */
-  def acceptAttr(label: String, uri: String): (Option[Node], XmlInputStore)
+  def acceptAttr(label: String, uri:URI): (Option[Node], XmlInputStore)
 
   /**
    * Accept the given unprefixed attribute, or fail. Succeeds when the given attribute exists

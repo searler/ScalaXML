@@ -57,11 +57,11 @@ class RandomAccessStore(myAttrs: NamedNodeMap, myNodes: Seq[Node],
    * Lookup the given element, based on label and URI. It uses the node map to efficiently 
    * perform lookups and removal.
    */
-  override def acceptElem(label: String, uri: String): (Option[Node], RandomAccessStore) = {
+  override def acceptElem(label: String, uri:URI): (Option[Node], RandomAccessStore) = {
     for (elems <- nodeMap.get(label);
          entry <- elems)
       entry.n match {
-        case e: Element if (e.getNamespaceURI == uri) => 
+        case e: Element if (e.getNamespaceURI == uri.uri) => 
           nodeMap.remove(label)
           return (Some(e), this)
       case _ => ()

@@ -258,14 +258,14 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     } (b => if (b) Some("") else None)
   
   /** Convenience method for creating an attribute within a namepace. */
-  def attr[A](label: String, pa: => Pickler[A], uri:String): Pickler[A] =
+  def attr[A](label: String, pa: => Pickler[A], uri:URI): Pickler[A] =
     attr(uri, label, pa)
 
   /**
    * Wrap a parser into a prefixed attribute. The attribute will contain all the 
    * content produced by 'pa' in the 'nodes' field.
    */
-  def attr[A](uri: String, key: String, pa: => Pickler[A]) = new Pickler[A] {
+  def attr[A](uri:URI, key: String, pa: => Pickler[A]) = new Pickler[A] {
     def pickle(v: A, in: XmlOutputStore) = {
       in.addAttribute(uri, key, v.toString)
     }
@@ -303,11 +303,11 @@ object Picklers extends AnyRef with TupleToPairFunctions {
    * this element are committed (this parser is not allowed to recover from failures in
    * parsing its content.
    */
-  def elem[A](label: String, pa: => Pickler[A])(implicit uri:String): Pickler[A] =
+  def elem[A](label: String, pa: => Pickler[A])(implicit uri:URI): Pickler[A] =
     elem(uri, label, commit(pa))
 
   /** Wrap a pickler into an element. */
-  def elem[A](uri: String, label: String, pa: => Pickler[A]) = new Pickler[A] {
+  def elem[A](uri:URI, label: String, pa: => Pickler[A]) = new Pickler[A] {
     def pickle(v: A, in: XmlOutputStore): XmlOutputStore = {
       pa.pickle(v, in.addNode(uri,label))
       in
@@ -352,7 +352,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
    * will parse an element entry with two subelements, link and author, in any order, with
    * possibly other elements between them.
    */
-  def interleaved[A](label: String, pa: => Pickler[A])(implicit uri:String): Pickler[A] =
+  def interleaved[A](label: String, pa: => Pickler[A])(implicit uri:URI): Pickler[A] =
     elem(label, interleaved(pa))(uri)
 
   /**
