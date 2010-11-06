@@ -25,6 +25,8 @@ import org.specs._
 
 
 
+
+
 /** 
  * This class tests simple XML pickler combinators.
  *
@@ -55,13 +57,26 @@ class PicklerTest extends  PicklerAsserts{
                 elem(TURI, "c", text) ~ elem(TURI, "d", text))
     )    
 
-  def pSeq2: Pickler[String ~ String] = 
+  def pSeq2 = 
     elem(TURI, "pair", 
         elem(TURI, "a", text) ~ elem(TURI, "b", text))
 
   def pSeq2Int: Pickler[String ~ Int] = 
     elem(TURI, "pair", 
         elem(TURI, "a", text) ~ elem(TURI, "b", intVal))
+
+ import com.google.xml.combinators.Converters._
+ def pSeq2IntType: Pickler[String ~ Int] = 
+    elem(TURI, "pair", 
+        elem(TURI, "a", text) ~ elem(TURI, "b", typedValue))
+
+ def pSeq2FloatType: Pickler[String ~ Float] = 
+    elem(TURI, "pair", 
+        elem(TURI, "a", text) ~ elem(TURI, "b", typedValue))
+
+ def pSeq2StringType: Pickler[String ~ String] = 
+    elem(TURI, "pair", 
+        elem(TURI, "a", text) ~ elem(TURI, "b", typedValue))
 
  def pSeq2Opt: Pickler[String ~Option[String]] = 
     elem(TURI, "pair", 
@@ -107,6 +122,15 @@ val inputInt =
 <b>12</b>
 </pair>
 """
+
+
+
+val inputFloat =
+    """<pair xmlns="testing-uri">
+<a>alfa</a>
+<b>12.34</b>
+</pair>
+"""
 val inputOpt =
     """<pair xmlns="testing-uri">
 <a>alfa</a>
@@ -123,7 +147,9 @@ val attrInputTURI =
        
 
   val pair = new ~("alfa", "omega")
+  val pairString: ~[String,String] = new ~("alfa", "omega")
   val pairInt = new ~("alfa", 12)
+  val pairFloat = new ~("alfa", 12.34F)
   val pairOptNone = new ~("alfa",None)
   val pairOptSome = new ~("alfa",Some("omega"))
   val pairNestedSeq = (new ~("alfa", "omega")) ~ (new ~("beta", "phi"))
@@ -207,6 +233,32 @@ val attrInputTURI =
   "testSequenceIntUnpickle" in  {
     assertSucceedsWith("Sequence unpickling failed", pairInt, inputInt, pSeq2Int)
   }
+
+  "testSequenceIntTypeUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairInt, inputInt, pSeq2IntType)
+  }
+
+ "testSequenceFloatTypeUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairFloat, inputFloat, pSeq2FloatType)
+  }
+
+"testSequenceStringTypeUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pair, input, pSeq2StringType)
+  }
+
+"testSequenceStringTypeUnpickleInferred" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairString, input, pSeq2StringType)
+  }
+
+ "testSequenceIntPickle" in  {
+       val pickled = pSeq2Int.pickle(pairInt, PlainOutputStore.empty)
+       normalize(inputInt) must beEqualTo(normalize(pickled.document))
+ }
+
+ "testSequenceIntTypePickle" in  {
+       val pickled = pSeq2IntType.pickle(pairInt, PlainOutputStore.empty)
+       normalize(inputInt) must beEqualTo(normalize(pickled.document))
+ }
   
   def pSeq3: Pickler[String ~ String ~ String] =
     elem(TURI, "triple",

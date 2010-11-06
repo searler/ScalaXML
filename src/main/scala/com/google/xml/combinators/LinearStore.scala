@@ -163,7 +163,7 @@ object LinearStore {
     buffer.toList
   }
 
-object NullNamedNodeMap extends NamedNodeMap {
+private object NullNamedNodeMap extends NamedNodeMap {
   def getLength:Int  = 0
   def getNamedItem(name:String) = null
   def getNamedItemNS(uri:String,local:String) = null

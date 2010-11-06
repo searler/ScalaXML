@@ -124,6 +124,10 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     /** Sequential composition. This pickler will accept an A and then a B. */
     def ~[B](pb: => Pickler[B]): Pickler[~[A, B]] = 
       seq(this, pb)
+
+ 
+
+
   }
 
   /** A basic pickler that serializes a value to a string and back.  */
@@ -137,6 +141,15 @@ object Picklers extends AnyRef with TupleToPairFunctions {
         case (None, in1)                => Failure("Text node expected", in1)
       }
     }
+  }
+
+  def typedValue[T](implicit tc:Convert[T]): Pickler[T] = {
+    def parse(literal: String, in: St): PicklerResult[T] = try {
+      Success(tc.parse(literal), in)
+    } catch {
+      case _ => Failure("Cannot parse", in) 
+    }
+    filter(text, parse, tc.unparse(_))
   }
 
   /** A basic pickler that serializes an integer value to a string and back. */
@@ -212,6 +225,8 @@ object Picklers extends AnyRef with TupleToPairFunctions {
    * @see http://atomenabled.org/developers/syndication/atom-format-spec.php#date.constructs
    */
   def dateTime: Pickler[DateTime] = dateTime(false)
+
+  
   
   /** 
    * Apply a pair of functions on the result of pa. Unlike 'wrap', 'f' may cause the 
