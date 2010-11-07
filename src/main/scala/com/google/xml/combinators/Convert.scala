@@ -17,6 +17,11 @@ object Converters{
     def unparse(v:Float) = v toString
    }
 
+ implicit object  DoubleConvert extends Convert[Double] {   
+    def parse(s:String) =  s toDouble
+    def unparse(v:Double) = v toString
+   }
+
     implicit object  StringConvert extends Convert[String] {   
     def parse(s:String) =  s
     def unparse(v:String) = v

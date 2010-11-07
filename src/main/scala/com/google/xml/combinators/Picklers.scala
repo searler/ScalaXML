@@ -20,6 +20,7 @@ import com.google.gdata.data.util.DateTime
 
 import java.text.ParseException
 import org.w3c.dom._
+import com.google.xml.combinators.Converters._
 
 /** 
  * A class for XML Pickling combinators.
@@ -157,14 +158,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
   }
 
   /** A basic pickler that serializes an integer value to a string and back. */
-  def intVal: Pickler[Int] = {
-    def parseInt(literal: String, in: St): PicklerResult[Int] = try {
-      Success(literal.toInt, in)
-    } catch {
-      case e: NumberFormatException => Failure("Integer literal expected", in) 
-    }
-    filter(text, parseInt, String.valueOf(_))
-  }
+  def intVal: Pickler[Int] = typedValue(IntConvert)
   
   /**
    * A basic pickler for boolean values. Everything equal to the string 'true' is
@@ -180,15 +174,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
    * 
    * @see java.lang.Double.valueOf for the exact grammar.
    */
-  def doubleVal: Pickler[Double] = {
-    def parseDouble(literal: String, in: St): PicklerResult[Double] = try {
-      Success(literal.toDouble, in)
-    } catch {
-      case e: NumberFormatException => Failure("Floating point literal expected", in)
-    }
-    
-    filter(text, parseDouble, String.valueOf(_))
-  }
+  def doubleVal: Pickler[Double] =  typedValue(DoubleConvert)
   
   
 
