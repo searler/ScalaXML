@@ -125,7 +125,11 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     def ~[B](pb: => Pickler[B]): Pickler[~[A, B]] = 
       seq(this, pb)
 
- 
+    def ~>[B](pb: => Pickler[B]): Pickler[A] = 
+      dropRight(this, pb)
+
+    def <~[B](pb: => Pickler[B]): Pickler[B] = 
+      dropLeft(this, pb)
 
 
   }
@@ -312,6 +316,22 @@ object Picklers extends AnyRef with TupleToPairFunctions {
       }
     }
   }
+
+
+   def ignore(uri:URI, label: String) = new Pickler[Unit] {
+    def pickle(v: Unit, in: XmlOutputStore): XmlOutputStore = {
+      in
+    }
+
+    def unpickle(in: St): PicklerResult[Unit] = {
+      in.acceptElem(label, uri) match {
+        case (Some(e: Element), in1) =>   Success((), in1)
+        case _ => 
+          Failure("Expected a <" + label + "> in " + uri, in)
+      }
+    }
+  }
+
   
   /** 
    * Convenience method for creating an element with an implicit namepace. Contents of
@@ -340,6 +360,39 @@ object Picklers extends AnyRef with TupleToPairFunctions {
       }
     }
   }
+
+ def dropRight[A, B](pa: => Pickler[A], pb: => Pickler[B]): Pickler[A] =  new Pickler[A] {
+    def pickle(v: A , in: XmlOutputStore): XmlOutputStore = 
+      pa.pickle(v, in)
+    
+    def unpickle(in: St): PicklerResult[A] = {
+      pa.unpickle(in) match {
+        case Success(va, in1) =>
+          pb.unpickle(in1) match {
+            case Success(vb, in2) => Success(va, in2)
+            case f: NoSuccess     => f
+          }
+        case f: NoSuccess => f
+      }
+    }
+  }
+
+  def dropLeft[A, B](pa: => Pickler[A], pb: => Pickler[B]): Pickler[B] =  new Pickler[B] {
+    def pickle(v: B , in: XmlOutputStore): XmlOutputStore = 
+      pb.pickle(v, in)
+    
+    def unpickle(in: St): PicklerResult[B] = {
+      pa.unpickle(in) match {
+        case Success(va, in1) =>
+          pb.unpickle(in1) match {
+            case Success(vb, in2) => Success(vb, in2)
+            case f: NoSuccess     => f
+          }
+        case f: NoSuccess => f
+      }
+    }
+  }
+
 
   /** Sequential composition of two picklers */
   def seq[A, B](pa: => Pickler[A], pb: => Pickler[B]): Pickler[~[A, B]] =  new Pickler[~[A, B]] {
@@ -533,7 +586,8 @@ object Picklers extends AnyRef with TupleToPairFunctions {
 /** Convenience class to hold two values (it has lighter syntax than pairs). */
 final case class ~[+A, +B](_1: A, _2: B) {
   override def toString = "~(" + _1 + ", " + _2 + ")"
-  
+
+ 
   /** Append another value to this pair. */
   def ~[C](c: C) = new ~(this, c)
 }

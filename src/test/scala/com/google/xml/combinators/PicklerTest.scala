@@ -61,6 +61,14 @@ class PicklerTest extends  PicklerAsserts{
     elem(TURI, "pair", 
         elem(TURI, "a", text) ~ elem(TURI, "b", text))
 
+ def pSeq2Start = 
+    elem(TURI, "pair", 
+        ignore(TURI,"x") <~ elem(TURI, "a", text)   ~ elem(TURI, "b", text)) 
+
+  def pSeq2Skip = 
+    elem(TURI, "pair", 
+        elem(TURI, "a", text) ~> ignore(TURI,"x") ~ elem(TURI, "b", text) )
+
   def pSeq2Int: Pickler[String ~ Int] = 
     elem(TURI, "pair", 
         elem(TURI, "a", text) ~ elem(TURI, "b", intVal))
@@ -88,6 +96,22 @@ class PicklerTest extends  PicklerAsserts{
           
   val input =
     """<pair xmlns="testing-uri">
+<a>alfa</a>
+<b>omega</b>
+</pair>
+"""
+
+ val inputSkip =
+    """<pair xmlns="testing-uri">
+<a>alfa</a>
+<x>xxx</x>
+<b>omega</b>
+</pair>
+"""
+
+val inputStart =
+    """<pair xmlns="testing-uri">
+<x>xxx</x>
 <a>alfa</a>
 <b>omega</b>
 </pair>
@@ -186,6 +210,23 @@ val attrInputTURI =
        normalize(input) must beEqualTo(normalize(pickled.document))
  }
 
+"testSequenceStartPickle" in  {
+ val pickled = pSeq2Start.pickle(pair, PlainOutputStore.empty)
+       normalize(input) must beEqualTo(normalize(pickled.document))
+ }
+
+"testSequenceSkipPickle" in  {
+ val pickled = pSeq2Skip.pickle(pair, PlainOutputStore.empty)
+       normalize(input) must beEqualTo(normalize(pickled.document))
+ }
+
+"testSequenceSkipPickle" in  {
+ val pickled = pSeq2Start.pickle(pair, PlainOutputStore.empty)
+       normalize(input) must beEqualTo(normalize(pickled.document))
+ }
+
+
+
  "testNestedPickle" in  {
  val pickled = pNested2.pickle(pair, PlainOutputStore.empty)
        normalize(inputNested) must beEqualTo(normalize(pickled.document))
@@ -208,6 +249,14 @@ val attrInputTURI =
 
 "testSequenceUnpickle" in  {
     assertSucceedsWith("Sequence unpickling failed", pair, input, pSeq2)
+  }
+
+"testSequenceSkipUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pair, inputSkip, pSeq2Skip)
+  }
+
+"testSequenceStartUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pair, inputStart, pSeq2Start)
   }
 
 "testNestedUnpickle" in  {
