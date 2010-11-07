@@ -165,8 +165,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
    * unpickled to the boolean value <code>true</code>, everything else to <code>false</code>.
    * It is not case sensitive.
    */
-  def boolVal: Pickler[Boolean] =
-    wrap (text) (java.lang.Boolean.valueOf(_).booleanValue) (String.valueOf(_))
+  def boolVal: Pickler[Boolean] = typedValue(BooleanConvert)
   
   /**
    * A basic pickler for floating point values. It accepts double values as specified by the

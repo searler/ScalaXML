@@ -22,6 +22,11 @@ object Converters{
     def unparse(v:Double) = v toString
    }
 
+  implicit object  BooleanConvert extends Convert[Boolean] {   
+    def parse(s:String) =  s toBoolean
+    def unparse(v:Boolean) = v toString
+   }
+
     implicit object  StringConvert extends Convert[String] {   
     def parse(s:String) =  s
     def unparse(v:String) = v
