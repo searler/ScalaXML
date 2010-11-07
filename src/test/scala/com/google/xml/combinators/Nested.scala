@@ -11,7 +11,7 @@ import Picklers._
 
 object Contained{
 import Picklers._
-  def rawPickler(implicit u:URI) = elem("contained", elem("tag",text)~elem("value",intVal))
+  def rawPickler(implicit u:URI) =  elem("tag",text)~elem("value",intVal)
   def pickler = wrapCaseClass(rawPickler(URI("contained-uri"))) (Contained.apply) (Contained.unapply)
 }
 

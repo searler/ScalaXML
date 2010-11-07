@@ -35,10 +35,10 @@ class NestedTest  extends PicklerAsserts{
  "parseContained" in {
     val in = """<rating xmlns="http://schemas.google.com/g/2005">
                     <name xmlns="testing-uri">name</name>
-                    <contained xmlns="contained-uri">
-                       <tag>tagged</tag>
-                       <value>123</value>
-                    </contained>
+                   
+                       <tag xmlns="contained-uri">tagged</tag>
+                       <value xmlns="contained-uri">123</value>
+                   
                  </rating>"""
             
      val result = Nested.pickler(Contained.pickler).unpickle(LinearStore.fromString(in))
@@ -78,14 +78,10 @@ class NestedTest  extends PicklerAsserts{
     val xml=   Nested.pickler(Contained.pickler).pickle(r,out)
     """<rating xmlns="http://schemas.google.com/g/2005">
 <name xmlns="testing-uri">name</name>
-<contained xmlns="contained-uri">
-<tag>tagged</tag>
-<value>123</value>
-</contained>
-<contained xmlns="contained-uri">
-<tag>l1</tag>
-<value>111</value>
-</contained>
+<tag xmlns="contained-uri">tagged</tag>
+<value xmlns="contained-uri">123</value>
+<tag xmlns="contained-uri">l1</tag>
+<value xmlns="contained-uri">111</value>
 </rating>
 """ must beEqualTo(normalize(xml.document))
 
