@@ -33,7 +33,7 @@ object Nested {
       elem("name",text)(TURI)  ~ ip ~ rep(ip)
 	  )(URI("http://schemas.google.com/g/2005"))
   
-   def fromNested[T](n:Nested[T]) = Some((new ~(n.name, n.internal)) ~ n.list)
+  private def fromNested[T](n:Nested[T]) = tuple3Unapply(Nested.unapply[T](n))
 
   def pickler[T](ip:Pickler[T]): Pickler[Nested[T]] = wrapCaseClass(rawPickler[T](ip)) (Nested.apply[T]) (fromNested[T])
 }
