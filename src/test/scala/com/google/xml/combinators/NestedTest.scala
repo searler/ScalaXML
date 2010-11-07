@@ -14,7 +14,7 @@ class NestedTest  extends PicklerAsserts{
 
    
 
-     "parse" in {
+     "parseInternal" in {
     val in = """<rating xmlns="http://schemas.google.com/g/2005">
                     <name xmlns="testing-uri">name</name>
                     <internal xmlns="nested-uri">
@@ -23,7 +23,7 @@ class NestedTest  extends PicklerAsserts{
                     </internal>
                  </rating>"""
             
-     val result = Nested.pickler.unpickle(LinearStore.fromString(in))
+     val result = Nested.pickler(Internal.internalPickler).unpickle(LinearStore.fromString(in))
      
       result match {
       case Success(v, _) => Nested("name",Internal("tagged",123),Nil) must beEqualTo(v)
@@ -31,14 +31,31 @@ class NestedTest  extends PicklerAsserts{
     }
 }
 
+
+ "parseContained" in {
+    val in = """<rating xmlns="http://schemas.google.com/g/2005">
+                    <name xmlns="testing-uri">name</name>
+                    <contained xmlns="contained-uri">
+                       <tag>tagged</tag>
+                       <value>123</value>
+                    </contained>
+                 </rating>"""
+            
+     val result = Nested.pickler(Contained.pickler).unpickle(LinearStore.fromString(in))
+     
+      result match {
+      case Success(v, _) => Nested("name",Contained("tagged",123),Nil) must beEqualTo(v)
+      case f: NoSuccess  => fail(f toString)
+    }
+}
  
 
 
-   "unparse" in {
+   "unparseInternal" in {
  val r=  Nested("name",Internal("tagged",123),Internal("l1",111)::Nil)
     
     val out = PlainOutputStore.empty
-    val xml=   Nested.pickler.pickle(r,out)
+    val xml=   Nested.pickler(Internal.internalPickler).pickle(r,out)
     """<rating xmlns="http://schemas.google.com/g/2005">
 <name xmlns="testing-uri">name</name>
 <internal xmlns="nested-uri">
@@ -49,6 +66,26 @@ class NestedTest  extends PicklerAsserts{
 <tag>l1</tag>
 <value>111</value>
 </internal>
+</rating>
+""" must beEqualTo(normalize(xml.document))
+
+  }
+
+ "unparseContained" in {
+ val r=  Nested("name",Contained("tagged",123),Contained("l1",111)::Nil)
+    
+    val out = PlainOutputStore.empty
+    val xml=   Nested.pickler(Contained.pickler).pickle(r,out)
+    """<rating xmlns="http://schemas.google.com/g/2005">
+<name xmlns="testing-uri">name</name>
+<contained xmlns="contained-uri">
+<tag>tagged</tag>
+<value>123</value>
+</contained>
+<contained xmlns="contained-uri">
+<tag>l1</tag>
+<value>111</value>
+</contained>
 </rating>
 """ must beEqualTo(normalize(xml.document))
 
