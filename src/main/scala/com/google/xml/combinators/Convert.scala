@@ -7,7 +7,7 @@ trait Convert[T] {
 
 class EnumConvert[E <: Enum[E]](c:Class[E]) extends Convert[E]{
    def parse(s:String) =  Enum.valueOf(c,s).asInstanceOf[E]
-   def unparse(v:E) = v toString
+   def unparse(v:E) = v name
 }
 
 object Converters{
