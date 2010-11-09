@@ -4,8 +4,6 @@ import org.specs._
 
 
 
-import scala.xml.PrettyPrinter
-
 import Picklers._
 
 class RatingTest  extends PicklerAsserts{

@@ -33,7 +33,7 @@ import org.specs._
  * @author Iulian Dragos (iuliandragos@google.com) 
  */
 
-class PicklerTest extends  PicklerAsserts{
+object PicklerTest extends  PicklerAsserts{
   import Picklers._
   
   final val TURI = URI("testing-uri")

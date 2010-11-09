@@ -5,6 +5,11 @@ trait Convert[T] {
   def unparse(v:T):String
 }
 
+class EnumConvert[E <: Enum[E]](c:Class[E]) extends Convert[E]{
+   def parse(s:String) =  Enum.valueOf(c,s).asInstanceOf[E]
+   def unparse(v:E) = v toString
+}
+
 object Converters{
 
   implicit object  IntConvert extends Convert[Int] {   
@@ -31,4 +36,6 @@ object Converters{
     def parse(s:String) =  s
     def unparse(v:String) = v
    }
+
+ 
 }
