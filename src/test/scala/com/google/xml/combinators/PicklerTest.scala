@@ -61,6 +61,14 @@ object PicklerTest extends  PicklerAsserts{
     elem(TURI, "pair", 
         elem(TURI, "a", text) ~ elem(TURI, "b", text))
 
+ def pListSeq2 = 
+    elem(TURI, "pair", 
+        rep(elem(TURI, "a", text) ~ elem(TURI, "b", text)))
+
+ def pMapSeq2 = 
+    elem(TURI, "pair", 
+        map(keyOnly(elem(TURI, "a", text),elem(TURI, "a", text) ~ elem(TURI, "b", text))))
+
  def pSeq2Start = 
     elem(TURI, "pair", 
         ignore(TURI,"x") <~ elem(TURI, "a", text)   ~ elem(TURI, "b", text)) 
@@ -98,6 +106,15 @@ object PicklerTest extends  PicklerAsserts{
     """<pair xmlns="testing-uri">
 <a>alfa</a>
 <b>omega</b>
+</pair>
+"""
+
+val inputMultiple =
+    """<pair xmlns="testing-uri">
+<a>alfa</a>
+<b>omega</b>
+<a>delta</a>
+<b>gamma</b>
 </pair>
 """
 
@@ -177,6 +194,10 @@ val attrInputTURI =
   val pairOptNone = new ~("alfa",None)
   val pairOptSome = new ~("alfa",Some("omega"))
   val pairNestedSeq = (new ~("alfa", "omega")) ~ (new ~("beta", "phi"))
+  val pairListSingle = List(new ~("alfa", "omega"))
+  val pairMapSingle = Map("alfa"->new ~("alfa", "omega"))
+  val pairListTwo = List(new ~("alfa", "omega"), new ~("delta","gamma"))
+  val pairMapTwo = Map("alfa"->new ~("alfa", "omega"),"delta"->new ~("delta", "gamma"))
 
  
 
@@ -208,6 +229,27 @@ val attrInputTURI =
  "testSequencePickle" in  {
  val pickled = pSeq2.pickle(pair, PlainOutputStore.empty)
        normalize(input) must beEqualTo(normalize(pickled.document))
+ }
+
+ "testListSequencePickle" in  {
+ val pickled = pListSeq2.pickle(pairListSingle, PlainOutputStore.empty)
+       normalize(input) must beEqualTo(normalize(pickled.document))
+ }
+
+"testListTwoSequencePickle" in  {
+ val pickled = pListSeq2.pickle(pairListTwo, PlainOutputStore.empty)
+       normalize(inputMultiple) must beEqualTo(normalize(pickled.document))
+ }
+
+
+ "testMapSequencePickle" in  {
+ val pickled = pMapSeq2.pickle(pairMapSingle, PlainOutputStore.empty)
+       normalize(input) must beEqualTo(normalize(pickled.document))
+ }
+
+"testMapTwoSequencePickle" in  {
+ val pickled = pMapSeq2.pickle(pairMapTwo, PlainOutputStore.empty)
+       normalize(inputMultiple) must beEqualTo(normalize(pickled.document))
  }
 
 "testSequenceStartPickle" in  {
@@ -249,6 +291,22 @@ val attrInputTURI =
 
 "testSequenceUnpickle" in  {
     assertSucceedsWith("Sequence unpickling failed", pair, input, pSeq2)
+  }
+
+"testListSequenceUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairListSingle, input, pListSeq2)
+  }
+
+"testMapSequenceUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairMapSingle, input, pMapSeq2)
+  }
+
+"testListTwoSequenceUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairListTwo, inputMultiple, pListSeq2)
+  }
+
+"testMapTwoSequenceUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairMapTwo, inputMultiple, pMapSeq2)
   }
 
 "testSequenceSkipUnpickle" in  {

@@ -485,6 +485,48 @@ object Picklers extends AnyRef with TupleToPairFunctions {
       }
     }
   }
+
+  def keyOnly[A,B](pa: => Pickler[A], pb: => Pickler[B]):Pickler[(A,B)] = new Pickler[(A,B)]{
+    def pickle(v: (A,B),in:XmlOutputStore): XmlOutputStore = {
+       pb.pickle(v._2,in)
+    }
+    def unpickle(in: St):PicklerResult[(A,B)] = {
+      pa.unpickle(in) match {
+         case Success(va,_) => {
+           pb.unpickle(in) match {
+              case Success(vb,in2) => Success((va,vb),in2)
+              case f: NoSuccess => f
+           }    
+         }
+         case f: NoSuccess => f
+      } 
+    }
+  }
+
+
+  def map[A,B](pa: => Pickler[(A,B)]): Pickler[Map[A,B]] = new Pickler[Map[A,B]] {
+    def pickle(vs: Map[A,B], in: XmlOutputStore): XmlOutputStore = {
+      if(vs.isEmpty)
+         in
+      else {
+        val v:(A,B) = vs.head
+        pickle(vs-v._1, pa.pickle(v, in))
+       }
+    }
+    
+    def unpickle(in: St): PicklerResult[Map[A,B]] = { 
+      val res1 = pa.unpickle(in).andThen { (v: (A,B), in1: St) => 
+         val Success(vs, in2) = unpickle(in1)
+         Success(vs+v, in2)
+      } 
+      res1 match {
+        case s: Success[_] => s
+        case f: Failure => Success(Map(), in)
+        case e: Error => e
+      }
+    }
+  }
+
   
   /**
    * Runs 'pb' unpickler on the first element that 'pa' successfully parses. It
