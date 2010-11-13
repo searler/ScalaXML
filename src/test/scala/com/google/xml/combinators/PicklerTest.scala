@@ -507,7 +507,7 @@ val attrInputTURI =
     implicit val ns =  URI("testing-uri")
     val input =
       """<p:strings xmlns:p="testing-uri">
-<p:str>one</p:str>
+<p:st>one</p:st>
 <p:str kind="special">this is special</p:str>
 <p:a>a</p:a>
 <p:b>b</p:b>
@@ -515,7 +515,7 @@ val attrInputTURI =
 """
     val pickler = elem("strings", 
       (when(elem("str", const(attr("kind", text), "special")), elem("str", text))
-       ~ elem("str", text) ~ elem("a", text) ~ elem("b", text)))
+       ~ elem("st", text) ~ elem("a", text) ~ elem("b", text)))
       
     val expected = new ~("this is special", "one") ~ "a" ~ "b"
     assertSucceedsWith("Unpickling when", expected, input, pickler)
