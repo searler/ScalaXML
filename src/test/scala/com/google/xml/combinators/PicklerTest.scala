@@ -67,6 +67,10 @@ def pXml =
     elem(TURI, "pair", 
         rep(elem(TURI, "a", text) ~ elem(TURI, "b", text)))
 
+def pSetSeq2 = 
+    elem(TURI, "pair", 
+        set(elem(TURI, "a", text) ~ elem(TURI, "b", text)))
+
  def pMapSeq2 = 
     elem(TURI, "pair", 
         map(keyOnly(elem(TURI, "a", text),elem(TURI, "a", text) ~ elem(TURI, "b", text))))
@@ -117,6 +121,17 @@ val inputMultiple =
 <b>omega</b>
 <a>delta</a>
 <b>gamma</b>
+</pair>
+"""
+
+val inputDuplicate =
+    """<pair xmlns="testing-uri">
+<a>alfa</a>
+<b>omega</b>
+<a>delta</a>
+<b>gamma</b>
+<a>alfa</a>
+<b>omega</b>
 </pair>
 """
 
@@ -197,9 +212,11 @@ val attrInputTURI =
   val pairOptSome = new ~("alfa",Some("omega"))
   val pairNestedSeq = (new ~("alfa", "omega")) ~ (new ~("beta", "phi"))
   val pairListSingle = List(new ~("alfa", "omega"))
+  val pairSetSingle = Set(new ~("alfa", "omega"))
   val pairMapSingle = Map("alfa"->new ~("alfa", "omega"))
   val pairListTwo = List(new ~("alfa", "omega"), new ~("delta","gamma"))
   val pairMapTwo = Map("alfa"->new ~("alfa", "omega"),"delta"->new ~("delta", "gamma"))
+  val pairSetTwo = Set(new ~("alfa", "omega"), new ~("delta","gamma"))
   
  
 
@@ -240,6 +257,11 @@ val attrInputTURI =
 
 "testListTwoSequencePickle" in  {
  val pickled = pListSeq2.pickle(pairListTwo, PlainOutputStore.empty)
+       normalize(inputMultiple) must beEqualTo(normalize(pickled.document))
+ }
+
+"testSetTwoSequencePickle" in  {
+ val pickled = pSetSeq2.pickle(pairSetTwo, PlainOutputStore.empty)
        normalize(inputMultiple) must beEqualTo(normalize(pickled.document))
  }
 
@@ -314,12 +336,24 @@ val attrInputTURI =
     assertSucceedsWith("Sequence unpickling failed", pairListSingle, input, pListSeq2)
   }
 
+"testSetSequenceUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairSetSingle, input, pSetSeq2)
+  }
+
 "testMapSequenceUnpickle" in  {
     assertSucceedsWith("Sequence unpickling failed", pairMapSingle, input, pMapSeq2)
   }
 
 "testListTwoSequenceUnpickle" in  {
     assertSucceedsWith("Sequence unpickling failed", pairListTwo, inputMultiple, pListSeq2)
+  }
+
+"testSetTwoUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairSetTwo, inputMultiple, pSetSeq2)
+  }
+
+"testSetTwoDuplicateUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairSetTwo, inputDuplicate, pSetSeq2)
   }
 
 "testMapTwoSequenceUnpickle" in  {

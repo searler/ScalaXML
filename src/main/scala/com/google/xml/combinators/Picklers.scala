@@ -520,6 +520,30 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     }
   }
 
+ def set[A](pa: => Pickler[A]): Pickler[Set[A]] = new Pickler[Set[A]] {
+    def pickle(vs: Set[A], in: XmlOutputStore): XmlOutputStore = {
+      if(vs.isEmpty)
+         in
+      else {
+        val v:A = vs.head
+        pickle(vs-v, pa.pickle(v, in))
+       }
+    }
+    
+    def unpickle(in: St): PicklerResult[Set[A]] = { 
+      val res1 = pa.unpickle(in).andThen { (v: A, in1: St) => 
+         val Success(vs, in2) = unpickle(in1)
+         Success(vs+v, in2)
+      } 
+      res1 match {
+        case s: Success[_] => s
+        case f: Failure => Success(Set(), in)
+        case e: Error => e
+      }
+    }
+  }
+
+
 
   def map[A,B](pa: => Pickler[(A,B)]): Pickler[Map[A,B]] = new Pickler[Map[A,B]] {
     def pickle(vs: Map[A,B], in: XmlOutputStore): XmlOutputStore = {
