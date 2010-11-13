@@ -67,7 +67,7 @@ trait XmlInputStore extends XmlStore {
   def acceptAttr(label: String): (Option[Node], XmlInputStore)
   
   /** Accept a text node. Fails if the head of the node list is not a text node. */
-  def acceptText: (Option[Node], XmlInputStore)
+  def acceptText: (Option[String], XmlInputStore)
 
   /**
    * Enter random access mode. If the random access level is greater than 0, we try to reuse

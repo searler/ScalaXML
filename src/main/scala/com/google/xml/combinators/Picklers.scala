@@ -144,7 +144,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
 
     def unpickle(in: St): PicklerResult[String] = {
       in.acceptText match {
-        case (Some(content), in1) => Success(content.getTextContent, in1)
+        case (Some(content), in1) => Success(content, in1)
         case (None, in1)                => Failure("Text node expected", in1)
       }
     }
@@ -193,9 +193,8 @@ object Picklers extends AnyRef with TupleToPairFunctions {
       
     def unpickle(in:St): PicklerResult[DateTime] = 
       in.acceptText match {
-        case (Some(n:Node), in1) =>
+        case (Some(str), in1) =>
           try {
-            val str = n.getTextContent
             if (allowDateOnly)
               Success(DateTime.parseDateOrDateTime(str), in1)
             else
