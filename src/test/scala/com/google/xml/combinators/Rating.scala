@@ -17,7 +17,7 @@ object Rating {
   final val TURI = URI("testing-uri")
   def rawPickler  = 
     elem("rating", 
-      elem("name",text)(TURI)  ~ attr("count", intVal) ~  attr("min", intVal) ~  default(attr("cost", intVal),666) ~ rep(elem("max", intVal)(TURI))
+      elem("name",text)(TURI)  ~ attr("count", intVal) ~  attr("min", intVal) ~  default(attr("cost", intVal),666) ~ list(elem("max", intVal)(TURI))
         )(URI("http://schemas.google.com/g/2005"))
   
    

@@ -30,7 +30,7 @@ object Nested {
 
   def rawPickler[T](ip:Pickler[T])  = 
     elem("rating", 
-      elem("name",text)(TURI)  ~ ip ~ rep(ip)
+      elem("name",text)(TURI)  ~ ip ~ list(ip)
 	  )(URI("http://schemas.google.com/g/2005"))
   
   private def fromNested[T](n:Nested[T]) = tuple3Unapply(Nested.unapply[T](n))

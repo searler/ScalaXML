@@ -65,7 +65,7 @@ def pXml =
 
  def pListSeq2 = 
     elem(TURI, "pair", 
-        rep(elem(TURI, "a", text) ~ elem(TURI, "b", text)))
+        list(elem(TURI, "a", text) ~ elem(TURI, "b", text)))
 
 def pSetSeq2 = 
     elem(TURI, "pair", 
@@ -436,7 +436,7 @@ val attrInputTURI =
     assertSucceedsWith("Sequence 3 unpickling failed", triple, inputTriple, pSeq3)
   }
 
-  def pStrings = elem(TURI, "strings", rep(elem(TURI, "str", text)))
+  def pStrings = elem(TURI, "strings", list(elem(TURI, "str", text)))
   "testRepetition0Unpickle" in  {
     val inputRep = """<p:strings xmlns:p="testing-uri"></p:strings>"""
       

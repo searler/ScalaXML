@@ -484,7 +484,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
   }
   
   /** A repetition pickler. It applies 'pa' until there it fails. */
-  def rep[A](pa: => Pickler[A]): Pickler[List[A]] = new Pickler[List[A]] {
+  def list[A](pa: => Pickler[A]): Pickler[List[A]] = new Pickler[List[A]] {
     def pickle(vs: List[A], in: XmlOutputStore): XmlOutputStore = vs match {
       case v :: vs => pickle(vs, pa.pickle(v, in))
       case Nil     => in
