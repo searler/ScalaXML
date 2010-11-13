@@ -60,6 +60,17 @@ object PicklerTest extends  PicklerAsserts{
  def pExtract = elem("strings", 
         elem(TURI,"str", attr("kind", text)))(TURI)
 
+def pPicklePartial:PartialFunction[String,Pickler[String~String]] =  {
+           case "cd" => elem(TURI, "str" ,elem(TURI, "c", text) ~ elem(TURI, "d", text))
+           case "ab" => elem(TURI, "str" ,elem(TURI, "a", text) ~ elem(TURI, "b", text))
+         }
+def pUnpicklePartial:PartialFunction[String~String,Pickler[String~String]] = {
+            case _ =>  elem(TURI, "str" ,elem(TURI, "a", text) ~ elem(TURI, "b", text))
+         }  
+ def pSwitch = elem("strings",
+         switch(elem(TURI,"str", attr("kind", text)), pPicklePartial, pUnpicklePartial)
+         )(TURI)
+
   def pWhen = elem("strings", 
       ((when(elem(TURI,"str", const(attr("kind", text), "special")), elem(TURI,"str", text)) |
        when(elem(TURI,"str", const(attr("kind", text), "other")), elem(TURI,"str", text)))
@@ -530,6 +541,35 @@ val attrInputTURI =
   
     val expected = "special"
     assertSucceedsWith("Unpickling when", expected, in, pExtract)
+  }
+
+
+   "testSwitchAB" in {
+    val in =
+      """<p:strings xmlns:p="testing-uri">
+<p:str kind="ab">
+<p:a>a</p:a>
+<p:b>b</p:b>
+</p:str>
+</p:strings>
+"""    
+    
+    val expected = new ~("a", "b") 
+    assertSucceedsWith("Unpickling when", expected, in, pSwitch)
+  }
+
+"testSwitchCD" in {
+    val in =
+      """<p:strings xmlns:p="testing-uri">
+<p:str kind="cd">
+<p:c>c</p:c>
+<p:d>d</p:d>
+</p:str>
+</p:strings>
+"""    
+    
+    val expected = new ~("c", "d") 
+    assertSucceedsWith("Unpickling when", expected, in, pSwitch)
   }
 
   
