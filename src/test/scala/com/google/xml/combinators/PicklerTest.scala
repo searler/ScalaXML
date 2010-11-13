@@ -57,6 +57,9 @@ object PicklerTest extends  PicklerAsserts{
                 elem(TURI, "c", text) ~ elem(TURI, "d", text))
     )    
 
+ def pExtract = elem("strings", 
+        elem(TURI,"str", attr("kind", text)))(TURI)
+
   def pWhen = elem("strings", 
       ((when(elem(TURI,"str", const(attr("kind", text), "special")), elem(TURI,"str", text)) |
        when(elem(TURI,"str", const(attr("kind", text), "other")), elem(TURI,"str", text)))
@@ -112,6 +115,16 @@ def pSetSeq2 =
  def pSeq2Default: Pickler[String ~ String] = 
     elem(TURI, "pair", 
         elem(TURI, "a", text)  ~ default(elem(TURI,"b",text),"omega"))
+
+
+  val inputSpecial =
+      """<p:strings xmlns:p="testing-uri">
+<p:st>one</p:st>
+<p:str kind="special">this is special</p:str>
+<p:a>a</p:a>
+<p:b>b</p:b>
+</p:strings>
+"""    
           
   val input =
     """<pair xmlns="testing-uri">
@@ -507,19 +520,24 @@ val attrInputTURI =
     val pickled = pStrings.pickle(strings, PlainOutputStore.empty)
     normalize(inputRep)  must beEqualTo( normalize(pickled.document))
   }
+
+"testExtract" in {
+  val in =
+      """<p:strings xmlns:p="testing-uri">
+<p:str kind="special">this is special</p:str>
+</p:strings>
+"""    
+  
+    val expected = "special"
+    assertSucceedsWith("Unpickling when", expected, in, pExtract)
+  }
+
   
   "testWhen" in {
   
-    val input =
-      """<p:strings xmlns:p="testing-uri">
-<p:st>one</p:st>
-<p:str kind="special">this is special</p:str>
-<p:a>a</p:a>
-<p:b>b</p:b>
-</p:strings>
-"""    
+  
     val expected = new ~("this is special", "one") ~ "a" ~ "b"
-    assertSucceedsWith("Unpickling when", expected, input, pWhen)
+    assertSucceedsWith("Unpickling when", expected, inputSpecial, pWhen)
   }
 
 
