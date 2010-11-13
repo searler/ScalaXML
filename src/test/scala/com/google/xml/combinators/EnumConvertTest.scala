@@ -26,7 +26,7 @@ object EnumConvertTest extends PicklerAsserts{
 <enum>BETA</enum>
 </container>"""
             
-     val result = EnumContainer.pickler.unpickle(LinearStore.fromString(in))
+     val result = EnumContainer.pickler.unpickle(LinearStore(in))
      
       result match {
       case Success(v, _) => EnumContainer("name",TestEnum.BETA) must beEqualTo(v)

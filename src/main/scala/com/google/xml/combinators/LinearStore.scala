@@ -130,21 +130,21 @@ object LinearStore {
     apply(store.attrs, store.nodes)
 
   /** Create a LinearStore from an element. */
-  def fromElem(e: Element) =
-    LinearStore(e.getAttributes, List(e))
+  def apply(e: Element): XmlInputStore =
+    apply(e.getAttributes, List(e))
   
   /** Create a LinearStore from the given Reader. */
-  def fromReader(in: Reader) = {
+  def apply(in: Reader): XmlInputStore = {
     val factory = DocumentBuilderFactory.newInstance
     factory setNamespaceAware true
     factory setIgnoringComments true
     val builder = factory.newDocumentBuilder
-    fromElem(builder.parse(new InputSource(in)).getDocumentElement)
+    apply(builder.parse(new InputSource(in)).getDocumentElement)
   }
   
   /** Create a LinearStore from the string. */
-  def fromString(f: String) = {
-    fromReader(new StringReader(f))
+  def apply(f: String): XmlInputStore = {
+    apply(new StringReader(f))
   }
 
   /** Create a LinearStore for the contents of the given element. */ 

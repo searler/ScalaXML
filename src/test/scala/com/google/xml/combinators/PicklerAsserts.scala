@@ -33,7 +33,7 @@ trait PicklerAsserts extends Specification {
   import Picklers._
    
   def assertSucceedsWith[A](name: String, expected: A, in: String, pa: Pickler[A]) {
-    val result = pa.unpickle(LinearStore.fromString(in))
+    val result = pa.unpickle(LinearStore(in))
     result match {
       case Success(v, _) =>  expected aka name must beEqualTo( v)
       case f: NoSuccess  =>  fail(f.toString)

@@ -28,7 +28,7 @@ val value = SimpleMapContainer("name",Map("tagged"->MapContained("tagged",123),"
  "parseContained" in {
     
             
-     val result = SimpleMapContainer.pickler.unpickle(LinearStore.fromString(in))
+     val result = SimpleMapContainer.pickler.unpickle(LinearStore(in))
      
       result match {
       case Success(v, _) => value must beEqualTo(v)

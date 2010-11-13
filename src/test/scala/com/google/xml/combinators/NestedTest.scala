@@ -23,7 +23,7 @@ class NestedTest  extends PicklerAsserts{
                     </internal>
                  </rating>"""
             
-     val result = Nested.pickler(Internal.internalPickler).unpickle(LinearStore.fromString(in))
+     val result = Nested.pickler(Internal.internalPickler).unpickle(LinearStore(in))
      
       result match {
       case Success(v, _) => Nested("name",Internal("tagged",123),Nil) must beEqualTo(v)
@@ -41,7 +41,7 @@ class NestedTest  extends PicklerAsserts{
                    
                  </rating>"""
             
-     val result = Nested.pickler(Contained.pickler).unpickle(LinearStore.fromString(in))
+     val result = Nested.pickler(Contained.pickler).unpickle(LinearStore(in))
      
       result match {
       case Success(v, _) => Nested("name",Contained("tagged",123),Nil) must beEqualTo(v)

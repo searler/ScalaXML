@@ -24,7 +24,7 @@ class SOAPTest  extends PicklerAsserts{
                    </env:Body>
                  </env:Envelope>"""
             
-     val result = SoapDocLiteral.pickler(Internal.internalPickler).unpickle(LinearStore.fromString(in))
+     val result = SoapDocLiteral.pickler(Internal.internalPickler).unpickle(LinearStore(in))
      
       result match {
       case Success(v, _) => SoapDocLiteral(Internal("tagged",123)) must beEqualTo(v)
@@ -41,7 +41,7 @@ class SOAPTest  extends PicklerAsserts{
                   </env:Body>
                  </env:Envelope>"""
             
-     val result = SoapDocLiteral.pickler(Contained.pickler).unpickle(LinearStore.fromString(in))
+     val result = SoapDocLiteral.pickler(Contained.pickler).unpickle(LinearStore(in))
      
       result match {
       case Success(v, _) => SoapDocLiteral(Contained("tagged",123)) must beEqualTo(v)

@@ -564,7 +564,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
       
       val target = in.nodes find {
         case e: Element => 
-          pa.unpickle(LinearStore.fromElem(e)) match {
+          pa.unpickle(LinearStore(e)) match {
             case _: Success[_] => true
             case f: NoSuccess => lastFailed = Some(f); false 
           }
@@ -573,7 +573,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
       
       target match {
         case Some(e: Element) => 
-          pb.unpickle(LinearStore.fromElem(e)) match {
+          pb.unpickle(LinearStore(e)) match {
             case Success(v1, in1) =>
               Success(v1, in.mkState(in.attrs, in.nodes.toList.filterNot(_ == e)))
             case f: NoSuccess =>

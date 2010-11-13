@@ -16,7 +16,7 @@ class RatingTest  extends PicklerAsserts{
                     <max xmlns="testing-uri">23</max>
                  </rating>"""
             
-     val result = Rating.pickler.unpickle(LinearStore.fromString(in))
+     val result = Rating.pickler.unpickle(LinearStore(in))
      
       result match {
       case Success(v, _) => Rating("name",9,12,14,12::23::Nil) must beEqualTo(v)
@@ -32,7 +32,7 @@ class RatingTest  extends PicklerAsserts{
                     <max xmlns="testing-uri">23</max>
                  </rating>"""
             
-     val result = Rating.pickler.unpickle(LinearStore.fromString(in))
+     val result = Rating.pickler.unpickle(LinearStore(in))
      
       result match {
       case Success(v, _) => Rating("name",9,13,666,12::23::Nil) must beEqualTo(v)

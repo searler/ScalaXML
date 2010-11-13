@@ -214,7 +214,7 @@ val attrInputTURI =
   } 
 
  "testAttrConvert" in {
-    val unpickled = pSeq2.unpickle(LinearStore.fromString(input)).get
+    val unpickled = pSeq2.unpickle(LinearStore(input)).get
     val pickled = pAttr2TURI.pickle(unpickled, PlainOutputStore.empty)
     normalize(attrInputTURI) must beEqualTo(normalize(pickled.document))
   } 
@@ -297,7 +297,7 @@ val attrInputTURI =
 
 "testXml" in  {
     
-    val result = pXml.unpickle(LinearStore.fromString("""<pair xmlns="testing-uri">
+    val result = pXml.unpickle(LinearStore("""<pair xmlns="testing-uri">
 <a>alfa</a>
 <b>omega</b>
 </pair>
