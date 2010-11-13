@@ -62,6 +62,8 @@ class LinearStore(ats: NamedNodeMap, nods: List[Node])
         case _ => (None, this)
       }
   }
+
+
   
   /**
    * Accept the given prefixed attribute, or fail. Succeeds when the given attribute exists

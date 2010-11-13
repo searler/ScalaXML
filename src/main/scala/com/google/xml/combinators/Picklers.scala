@@ -135,6 +135,8 @@ object Picklers extends AnyRef with TupleToPairFunctions {
 
   }
 
+ 
+
   /** A basic pickler that serializes a value to a string and back.  */
   def text: Pickler[String] = new Pickler[String] {
     def pickle(v: String, in: XmlOutputStore): XmlOutputStore = 
@@ -325,6 +327,22 @@ object Picklers extends AnyRef with TupleToPairFunctions {
    */
   def elem[A](label: String, pa: => Pickler[A])(implicit uri:URI): Pickler[A] =
     elem(uri, label, commit(pa))
+
+
+ def xml(uri:URI, label: String) = new Pickler[org.w3c.dom.Element] {
+    def pickle(v: org.w3c.dom.Element, in: XmlOutputStore): XmlOutputStore = {
+      in.importElement(v)
+      in
+    }
+
+    def unpickle(in: St): PicklerResult[org.w3c.dom.Element] = {
+      in.acceptElem(label, uri) match {
+        case (Some(v: Element), in1) =>  Success(v, in1)
+        case _ => 
+          Failure("Expected a <" + label + "> in " + uri, in)
+      }
+    }
+  }
 
   /** Wrap a pickler into an element. */
   def elem[A](uri:URI, label: String, pa: => Pickler[A]) = new Pickler[A] {

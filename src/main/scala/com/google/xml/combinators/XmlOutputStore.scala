@@ -34,6 +34,7 @@ trait XmlOutputStore{
   }
 
   def addElement(e:Element)
+  def importElement(e:Element)
 
   def document:Document
 }
@@ -68,6 +69,10 @@ class ElementOutputStore(val element:Element) extends XmlOutputStore {
   def addElement(e:Element) {
     element.appendChild(e)
   }
+
+  def importElement(e:Element) {
+    element.appendChild(document.importNode(e,true))
+  }
    
 }
 
@@ -82,6 +87,10 @@ class DocumentOutputStore(val document:Document) extends XmlOutputStore {
 
   def addElement(e:Element) {
     document.appendChild(e)
+  }
+
+ def  importElement(e:Element) {
+    document.appendChild(document.importNode(e,true))
   }
  
 }

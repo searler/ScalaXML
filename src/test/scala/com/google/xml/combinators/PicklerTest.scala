@@ -60,6 +60,8 @@ object PicklerTest extends  PicklerAsserts{
   def pSeq2 = 
     elem(TURI, "pair", 
         elem(TURI, "a", text) ~ elem(TURI, "b", text))
+def pXml = 
+    xml(TURI, "pair")
 
  def pListSeq2 = 
     elem(TURI, "pair", 
@@ -198,7 +200,7 @@ val attrInputTURI =
   val pairMapSingle = Map("alfa"->new ~("alfa", "omega"))
   val pairListTwo = List(new ~("alfa", "omega"), new ~("delta","gamma"))
   val pairMapTwo = Map("alfa"->new ~("alfa", "omega"),"delta"->new ~("delta", "gamma"))
-
+  
  
 
 
@@ -291,6 +293,21 @@ val attrInputTURI =
 
 "testSequenceUnpickle" in  {
     assertSucceedsWith("Sequence unpickling failed", pair, input, pSeq2)
+  }
+
+"testXml" in  {
+    
+    val result = pXml.unpickle(LinearStore.fromString("""<pair xmlns="testing-uri">
+<a>alfa</a>
+<b>omega</b>
+</pair>
+"""))
+    result match {
+      case Success(v:org.w3c.dom.Element, _) =>  "\nalfa\nomega\n" must beEqualTo( v.getTextContent)
+      case f: NoSuccess  =>  fail(f.toString)
+    }
+     val pickled = pXml.pickle(result.get, PlainOutputStore.empty)
+       normalize(input) must beEqualTo(normalize(pickled.document))
   }
 
 "testListSequenceUnpickle" in  {
