@@ -57,6 +57,11 @@ object PicklerTest extends  PicklerAsserts{
                 elem(TURI, "c", text) ~ elem(TURI, "d", text))
     )    
 
+  def pWhen = elem("strings", 
+      ((when(elem(TURI,"str", const(attr("kind", text), "special")), elem(TURI,"str", text)) |
+       when(elem(TURI,"str", const(attr("kind", text), "other")), elem(TURI,"str", text)))
+       ~ elem(TURI,"st", text) ~ elem(TURI,"a", text) ~ elem(TURI,"b", text)))(TURI)
+
   def pSeq2 = 
     elem(TURI, "pair", 
         elem(TURI, "a", text) ~ elem(TURI, "b", text))
@@ -504,7 +509,7 @@ val attrInputTURI =
   }
   
   "testWhen" in {
-    implicit val ns =  URI("testing-uri")
+  
     val input =
       """<p:strings xmlns:p="testing-uri">
 <p:st>one</p:st>
@@ -512,14 +517,28 @@ val attrInputTURI =
 <p:a>a</p:a>
 <p:b>b</p:b>
 </p:strings>
-"""
-    val pickler = elem("strings", 
-      (when(elem("str", const(attr("kind", text), "special")), elem("str", text))
-       ~ elem("st", text) ~ elem("a", text) ~ elem("b", text)))
-      
+"""    
     val expected = new ~("this is special", "one") ~ "a" ~ "b"
-    assertSucceedsWith("Unpickling when", expected, input, pickler)
+    assertSucceedsWith("Unpickling when", expected, input, pWhen)
   }
+
+
+"testWhenNoSpecial" in {
+  
+    val input =
+      """<p:strings xmlns:p="testing-uri">
+<p:st>one</p:st>
+<p:str kind="other">not special</p:str>
+<p:a>a</p:a>
+<p:b>b</p:b>
+<p:str kind="xxx">this is special</p:str>
+
+</p:strings>
+"""    
+    val expected = new ~("not special", "one") ~ "a" ~ "b"
+    assertSucceedsWith("Unpickling when", expected, input, pWhen)
+  }
+  
   
   "testWhenInterleaved" in {
     implicit val ns = URI("testing-uri")
