@@ -98,13 +98,13 @@ def pSetSeq2 =
     elem(TURI, "pair", 
         map(keyOnly(elem(TURI, "a", text),elem(TURI, "a", text) ~ elem(TURI, "b", text))))
 
- def pSeq2Start = 
+ def pSeq2Start : Pickler[String ~ String] = 
     elem(TURI, "pair", 
-        ignore(TURI,"x") <~ elem(TURI, "a", text)   ~ elem(TURI, "b", text)) 
+        ignore(TURI,"x") ~> elem(TURI, "a", text)   ~ elem(TURI, "b", text)) 
 
-  def pSeq2Skip = 
+  def pSeq2Skip: Pickler[String ~ String] = 
     elem(TURI, "pair", 
-        elem(TURI, "a", text) ~> ignore(TURI,"x") ~ elem(TURI, "b", text) )
+        (elem(TURI, "a", text) <~ ignore(TURI,"x")) ~ elem(TURI, "b", text) )
 
   def pSeq2Int: Pickler[String ~ Int] = 
     elem(TURI, "pair", 

@@ -33,8 +33,8 @@ object Variant{
 def discrim = elem(TURI,"value", attr("kind",text))
 
  def unpickle:PartialFunction[String, St =>PicklerResult[Common]] = {  
-                  case "internal" => (discrim <~ Internal.internalPickler).unpickle
-                  case "contained" =>  (discrim <~ Contained.pickler).unpickle
+                  case "internal" => (discrim ~> Internal.internalPickler).unpickle
+                  case "contained" =>  (discrim ~> Contained.pickler).unpickle
                }
 
   def pickle:PartialFunction[Common, XmlOutputStore => XmlOutputStore] = {

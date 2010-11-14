@@ -129,10 +129,10 @@ object Picklers extends AnyRef with TupleToPairFunctions {
    def |(pb: => Pickler[A]): Pickler[A] = 
       or(this, pb)
 
-    def ~>[B](pb: => Pickler[B]): Pickler[A] = 
+    def <~[B](pb: => Pickler[B]): Pickler[A] = 
       dropRight(this, pb)
 
-    def <~[B](pb: => Pickler[B]): Pickler[B] = 
+    def ~>[B](pb: => Pickler[B]): Pickler[B] = 
       dropLeft(this, pb)
 
 
