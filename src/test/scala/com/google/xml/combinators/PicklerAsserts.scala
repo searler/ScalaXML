@@ -42,8 +42,8 @@ trait PicklerAsserts extends Specification {
   
   /** Test that the value 'v' pickles to the expected xml node. */
   def assertPicklesTo[A](name: String, expected: Node, v: A, pa: Pickler[A]) {
-     val p = pa.pickle(v)
-     expected aka name must beEqualTo(p.document)
+     val doc = pa.pickleDocument(v)
+     expected aka name must beEqualTo(doc)
   }
   
   /**
