@@ -1,7 +1,9 @@
 package com.google.xml.combinators
 
-case class Internal(tag:String,value:Int)
-case class Contained(tag:String,value:Int)
+trait Common
+
+case class Internal(tag:String,value:Int) extends Common
+case class Contained(tag:String,value:Int) extends Common
 
 object Internal{
 import Picklers._
@@ -20,6 +22,31 @@ case class Nested[T](
     internal:T,
     list: List[T]
     ) {}
+
+case class Variant(value:Common)
+
+object Variant{
+  import Picklers._
+
+ final val TURI = URI("testing-uri")
+
+ def unpickle:PartialFunction[String, St =>PicklerResult[Common]] = {  
+                  case "internal" => (ignore(TURI,"value") <~ Internal.internalPickler).unpickle
+                  case "contained" =>  (ignore(TURI,"value") <~ Contained.pickler).unpickle
+               }
+
+  def pickle:PartialFunction[Common, XmlOutputStore => XmlOutputStore] = {
+                          case i:Internal => Internal.internalPickler.pickle(i,_)
+                          case c:Contained => Contained.pickler.pickle(c,_)
+                       }
+
+ def pickler = elem(TURI, "variant",
+                       switch(elem(TURI,"value", attr("kind",text)), 
+                         unpickle, pickle)
+                     )
+
+}
+
 
 object Nested {
  

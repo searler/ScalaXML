@@ -535,11 +535,11 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     }
   }
 
-  def switch[A,B](pa: => Pickler[A],pf: => PartialFunction[A,Pickler[B]], uf: => PartialFunction[B,Pickler[B]]):Pickler[B] = new Pickler[B]{
-     def pickle(v:B, in:XmlOutputStore) = uf(v).pickle(v,in)
+  def switch[A,B](pa: => Pickler[A],uf: => PartialFunction[A,St=>PicklerResult[B]], pf: => PartialFunction[B,XmlOutputStore=>XmlOutputStore]):Pickler[B] = new Pickler[B]{
+     def pickle(v:B, in:XmlOutputStore) = pf(v)(in)
      def unpickle(in :St) : PicklerResult[B] = {
         pa.unpickle(in) match {
-          case Success(v,_) => pf(v).unpickle(in)
+          case Success(v,_) => uf(v)(in)
           case f:NoSuccess => f
         }
      }

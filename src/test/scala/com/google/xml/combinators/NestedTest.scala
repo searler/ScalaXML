@@ -12,6 +12,28 @@ import Picklers._
 
 class NestedTest  extends PicklerAsserts{
 
+
+
+
+     "parseVariantInternal" in {
+    val in = """<variant xmlns="testing-uri">
+                   <value kind="internal"/>
+                    <internal xmlns="nested-uri">
+                       <tag>tagged</tag>
+                       <value>123</value>
+                    </internal>
+                 </variant>"""
+            
+     val result = Variant.pickler.unpickle(LinearStore(in))
+     
+      result match {
+      case Success(v, _) =>Internal("tagged",123) must beEqualTo(v)
+      case f: NoSuccess  => fail(f toString)
+    }
+}
+
+
+
    
 
      "parseInternal" in {
@@ -27,6 +49,22 @@ class NestedTest  extends PicklerAsserts{
      
       result match {
       case Success(v, _) => Nested("name",Internal("tagged",123),Nil) must beEqualTo(v)
+      case f: NoSuccess  => fail(f toString)
+    }
+}
+
+"parseVariantContained" in {
+    val in = """<variant xmlns="testing-uri">
+                   <value kind="contained"/>
+                   
+                       <tag xmlns="contained-uri">tagged</tag>
+                       <value xmlns="contained-uri">123</value>
+                 </variant>"""
+            
+     val result = Variant.pickler.unpickle(LinearStore(in))
+     
+      result match {
+      case Success(v, _) =>Contained("tagged",123) must beEqualTo(v)
       case f: NoSuccess  => fail(f toString)
     }
 }
@@ -86,8 +124,8 @@ class NestedTest  extends PicklerAsserts{
 """ must beEqualTo(normalize(xml.document))
 
   }
-      
-  
+
+
   
 
 }

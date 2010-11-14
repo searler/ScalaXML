@@ -60,15 +60,19 @@ object PicklerTest extends  PicklerAsserts{
  def pExtract = elem("strings", 
         elem(TURI,"str", attr("kind", text)))(TURI)
 
-def pPicklePartial:PartialFunction[String,Pickler[String~String]] =  {
-           case "cd" => elem(TURI, "str" ,elem(TURI, "c", text) ~ elem(TURI, "d", text))
-           case "ab" => elem(TURI, "str" ,elem(TURI, "a", text) ~ elem(TURI, "b", text))
+  def cd = elem(TURI, "str" ,elem(TURI, "c", text) ~ elem(TURI, "d", text))
+  def ab =  elem(TURI, "str" ,elem(TURI, "a", text) ~ elem(TURI, "b", text))
+
+def pPicklePartial:PartialFunction[String~String,XmlOutputStore=>XmlOutputStore] =  {
+           case v => cd.pickle(v,_)
          }
-def pUnpicklePartial:PartialFunction[String~String,Pickler[String~String]] = {
-            case _ =>  elem(TURI, "str" ,elem(TURI, "a", text) ~ elem(TURI, "b", text))
+def pUnpicklePartial:PartialFunction[String, St =>PicklerResult[String~String]] = {
+           case "cd" => cd.unpickle
+           case "ab" => ab.unpickle
+           
          }  
  def pSwitch = elem("strings",
-         switch(elem(TURI,"str", attr("kind", text)), pPicklePartial, pUnpicklePartial)
+         switch(elem(TURI,"str", attr("kind", text)), pUnpicklePartial, pPicklePartial)
          )(TURI)
 
   def pWhen = elem("strings", 
