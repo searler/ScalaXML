@@ -12,7 +12,67 @@ import Picklers._
 
 class SOAPTest  extends PicklerAsserts{
 
-   
+   val inFault = """<env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope"
+              xmlns:m="http://www.example.org/timeouts"
+              xmlns:xml="http://www.w3.org/XML/1998/namespace">
+ <env:Body>
+  <env:Fault>
+   <env:Code>
+     <env:Value>env:Sender</env:Value>
+     <env:Subcode>
+      <env:Value>m:MessageTimeout</env:Value>
+     </env:Subcode>
+   </env:Code>
+  
+   <env:Reason>
+     <env:Text xml:lang="en">Sender Timeout</env:Text>
+       <env:Text xml:lang="af">Besender tuid</env:Text>
+   </env:Reason>
+   <env:Detail>
+     <m:MaxTime>P5M</m:MaxTime>
+   </env:Detail>    
+  </env:Fault>
+ </env:Body>
+</env:Envelope>
+"""		
+ 
+  val pFault = Fault("env:Sender",Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"))
+  
+    "parseFault" in {
+        val result = Fault.pickler().unpickle(inFault)
+     
+      result match {
+      case Success(v, _) => pFault must beEqualTo(v)
+      case f: NoSuccess  => fail(f toString)
+    }
+}      
+
+ "unparseFault" in {
+
+    
+    
+    val xml=   Fault.pickler.pickle(pFault)
+    """<Envelope xmlns="http://www.w3.org/2003/05/soap-envelope">
+<Body>
+<Fault>
+<Code>
+<Value>env:Sender</Value>
+<Subcode>
+<Value>m:MessageTimeout</Value>
+</Subcode>
+</Code>
+<Reason>
+<Text>Sender Timeout</Text>
+<Text>Besender tuid</Text>
+</Reason>
+</Fault>
+</Body>
+</Envelope>
+""" must beEqualTo(normalize(xml))
+
+  
+  }
+
 
      "parseInternal" in {
     val in = """<env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope">
@@ -54,8 +114,8 @@ class SOAPTest  extends PicklerAsserts{
    "unparseInternal" in {
  val r=  DocLiteral(Internal("tagged",123))
     
-    val out = PlainOutputStore.empty
-    val xml=   DocLiteral.pickler(Internal.internalPickler).pickle(r,out)
+    
+    val xml=   DocLiteral.pickler(Internal.internalPickler).pickle(r)
     """<Envelope xmlns="http://www.w3.org/2003/05/soap-envelope">
 <Body>
 <internal xmlns="nested-uri">
@@ -64,7 +124,7 @@ class SOAPTest  extends PicklerAsserts{
 </internal>
 </Body>
 </Envelope>
-""" must beEqualTo(normalize(xml.document))
+""" must beEqualTo(normalize(xml))
 
    checkBody( "\n\ntagged\n123\n\n",xml.document)
   }
