@@ -129,6 +129,8 @@ object LinearStore {
   def apply(store: XmlStore): XmlInputStore =
     apply(store.attrs, store.nodes)
 
+  def apply(doc: Document): XmlInputStore = apply(doc.getDocumentElement)
+
   /** Create a LinearStore from an element. */
   def apply(e: Element): XmlInputStore =
     apply(e.getAttributes, List(e))

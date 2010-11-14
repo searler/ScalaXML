@@ -261,7 +261,7 @@ val attrInputTURI =
   } 
 
  "testAttrConvert" in {
-    val unpickled = pSeq2.unpickle(LinearStore(input)).get
+    val unpickled = pSeq2.unpickle(input).get
     val pickled = pAttr2TURI.pickle(unpickled)
     normalize(attrInputTURI) must beEqualTo(normalize(pickled))
   } 

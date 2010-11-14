@@ -33,7 +33,7 @@ trait PicklerAsserts extends Specification {
   import Picklers._
    
   def assertSucceedsWith[A](name: String, expected: A, in: String, pa: Pickler[A]) {
-    val result = pa.unpickle(LinearStore(in))
+    val result = pa.unpickle(in)
     result match {
       case Success(v, _) =>  expected aka name must beEqualTo( v)
       case f: NoSuccess  =>  fail(f.toString)
@@ -42,7 +42,7 @@ trait PicklerAsserts extends Specification {
   
   /** Test that the value 'v' pickles to the expected xml node. */
   def assertPicklesTo[A](name: String, expected: Node, v: A, pa: Pickler[A]) {
-     val p = pa.pickle(v, PlainOutputStore.empty)
+     val p = pa.pickle(v)
      expected aka name must beEqualTo(p.document)
   }
   
