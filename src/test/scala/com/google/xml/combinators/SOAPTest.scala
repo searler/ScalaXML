@@ -41,7 +41,7 @@ class SOAPTest  extends PicklerAsserts{
 </env:Envelope>
 """		
  
-  val pFault = Fault("env:Sender",Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"),"http://jenkov.com/theNodeThatFailed","http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver")
+  val pFault = Fault("env:Sender",Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"),Some("http://jenkov.com/theNodeThatFailed"),Some("http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver"))
   
     "parseFault" in {
         val result = Fault.pickler().unpickle(inFault)
