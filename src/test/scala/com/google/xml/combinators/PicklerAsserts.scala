@@ -59,5 +59,7 @@ trait PicklerAsserts extends Specification {
      writer.toString
   }
 
+ def normalize(xml:XmlOutputStore):String = normalize(xml.document) 
+
   def normalize(s:String) = s
 }
