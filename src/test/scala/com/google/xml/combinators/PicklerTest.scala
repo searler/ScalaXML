@@ -256,13 +256,13 @@ val attrInputTURI =
   } 
 
 "testAttrTURIPickle" in {
-    val pickled = pAttr2TURI.pickle(pair, PlainOutputStore.empty)
+    val pickled = pAttr2TURI.pickle(pair)
     normalize(attrInputTURI) must beEqualTo(normalize(pickled.document))
   } 
 
  "testAttrConvert" in {
     val unpickled = pSeq2.unpickle(LinearStore(input)).get
-    val pickled = pAttr2TURI.pickle(unpickled, PlainOutputStore.empty)
+    val pickled = pAttr2TURI.pickle(unpickled)
     normalize(attrInputTURI) must beEqualTo(normalize(pickled.document))
   } 
 
@@ -271,75 +271,75 @@ val attrInputTURI =
   } 
 
 "testAttrPickle" in {
-    val pickled = pAttr2.pickle(pair, PlainOutputStore.empty)
+    val pickled = pAttr2.pickle(pair)
     normalize(attrInput) must beEqualTo(normalize(pickled.document))
   } 
 
  "testSequencePickle" in  {
- val pickled = pSeq2.pickle(pair, PlainOutputStore.empty)
+ val pickled = pSeq2.pickle(pair)
        normalize(input) must beEqualTo(normalize(pickled.document))
  }
 
  "testListSequencePickle" in  {
- val pickled = pListSeq2.pickle(pairListSingle, PlainOutputStore.empty)
+ val pickled = pListSeq2.pickle(pairListSingle)
        normalize(input) must beEqualTo(normalize(pickled.document))
  }
 
 "testListTwoSequencePickle" in  {
- val pickled = pListSeq2.pickle(pairListTwo, PlainOutputStore.empty)
+ val pickled = pListSeq2.pickle(pairListTwo)
        normalize(inputMultiple) must beEqualTo(normalize(pickled.document))
  }
 
 "testSetTwoSequencePickle" in  {
- val pickled = pSetSeq2.pickle(pairSetTwo, PlainOutputStore.empty)
+ val pickled = pSetSeq2.pickle(pairSetTwo)
        normalize(inputMultiple) must beEqualTo(normalize(pickled.document))
  }
 
 
  "testMapSequencePickle" in  {
- val pickled = pMapSeq2.pickle(pairMapSingle, PlainOutputStore.empty)
+ val pickled = pMapSeq2.pickle(pairMapSingle)
        normalize(input) must beEqualTo(normalize(pickled.document))
  }
 
 "testMapTwoSequencePickle" in  {
- val pickled = pMapSeq2.pickle(pairMapTwo, PlainOutputStore.empty)
+ val pickled = pMapSeq2.pickle(pairMapTwo)
        normalize(inputMultiple) must beEqualTo(normalize(pickled.document))
  }
 
 "testSequenceStartPickle" in  {
- val pickled = pSeq2Start.pickle(pair, PlainOutputStore.empty)
+ val pickled = pSeq2Start.pickle(pair)
        normalize(input) must beEqualTo(normalize(pickled.document))
  }
 
 "testSequenceSkipPickle" in  {
- val pickled = pSeq2Skip.pickle(pair, PlainOutputStore.empty)
+ val pickled = pSeq2Skip.pickle(pair)
        normalize(input) must beEqualTo(normalize(pickled.document))
  }
 
 "testSequenceSkipPickle" in  {
- val pickled = pSeq2Start.pickle(pair, PlainOutputStore.empty)
+ val pickled = pSeq2Start.pickle(pair)
        normalize(input) must beEqualTo(normalize(pickled.document))
  }
 
 
 
  "testNestedPickle" in  {
- val pickled = pNested2.pickle(pair, PlainOutputStore.empty)
+ val pickled = pNested2.pickle(pair)
        normalize(inputNested) must beEqualTo(normalize(pickled.document))
  }
 
 "testNestedSeqPickle" in  {
- val pickled = pNestedSeq2.pickle(pairNestedSeq, PlainOutputStore.empty)
+ val pickled = pNestedSeq2.pickle(pairNestedSeq)
        normalize(inputNestedSeq) must beEqualTo(normalize(pickled.document))
  }
 
 "testSequenceOptSomePickle" in  {
- val pickled = pSeq2Opt.pickle(pairOptSome, PlainOutputStore.empty)
+ val pickled = pSeq2Opt.pickle(pairOptSome)
        normalize(input) must beEqualTo(normalize(pickled.document))
  }
 
 "testSequenceOptNonePickle" in  {
- val pickled = pSeq2Opt.pickle(pairOptNone, PlainOutputStore.empty)
+ val pickled = pSeq2Opt.pickle(pairOptNone)
        normalize(inputOpt) must beEqualTo(normalize(pickled.document))
  }
 
@@ -358,7 +358,7 @@ val attrInputTURI =
       case Success(v:org.w3c.dom.Element, _) =>  "\nalfa\nomega\n" must beEqualTo( v.getTextContent)
       case f: NoSuccess  =>  fail(f.toString)
     }
-     val pickled = pXml.pickle(result.get, PlainOutputStore.empty)
+     val pickled = pXml.pickle(result.get)
        normalize(input) must beEqualTo(normalize(pickled.document))
   }
 
@@ -439,12 +439,12 @@ val attrInputTURI =
   }
 
  "testSequenceIntPickle" in  {
-       val pickled = pSeq2Int.pickle(pairInt, PlainOutputStore.empty)
+       val pickled = pSeq2Int.pickle(pairInt)
        normalize(inputInt) must beEqualTo(normalize(pickled.document))
  }
 
  "testSequenceIntTypePickle" in  {
-       val pickled = pSeq2IntType.pickle(pairInt, PlainOutputStore.empty)
+       val pickled = pSeq2IntType.pickle(pairInt)
        normalize(inputInt) must beEqualTo(normalize(pickled.document))
  }
   
@@ -503,7 +503,7 @@ val attrInputTURI =
 """
       
     val strings = List()
-    val pickled = pStrings.pickle(strings, PlainOutputStore.empty)
+    val pickled = pStrings.pickle(strings)
     normalize(inputRep) must beEqualTo( normalize(pickled.document))
   }
 
@@ -515,7 +515,7 @@ val attrInputTURI =
 """
       
     val strings = List("one")
-    val pickled = pStrings.pickle(strings, PlainOutputStore.empty)
+    val pickled = pStrings.pickle(strings)
     normalize(inputRep) must beEqualTo( normalize(pickled.document))
   }
 
@@ -529,7 +529,7 @@ val attrInputTURI =
 """
       
     val strings = List("one", "two", "three")
-    val pickled = pStrings.pickle(strings, PlainOutputStore.empty)
+    val pickled = pStrings.pickle(strings)
     normalize(inputRep)  must beEqualTo( normalize(pickled.document))
   }
 

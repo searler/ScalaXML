@@ -135,6 +135,8 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     def ~>[B](pb: => Pickler[B]): Pickler[B] = 
       dropLeft(this, pb)
 
+    def pickle(v: A): XmlOutputStore = pickle(v,PlainOutputStore.empty)
+
 
   }
 

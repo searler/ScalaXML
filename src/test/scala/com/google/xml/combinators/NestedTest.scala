@@ -44,17 +44,14 @@ class NestedTest  extends PicklerAsserts{
   "unparseVariantInternal" in {
  
     
-    val out = PlainOutputStore.empty
-    val xml=   Variant.pickler.pickle(pInternal,out)
+  
+    val xml=   Variant.pickler.pickle(pInternal)
     inVariantInternal must beEqualTo(normalize(xml.document))
 
   }
 
 "unparseVariantContaned" in {
- 
-    
-    val out = PlainOutputStore.empty
-    val xml=   Variant.pickler.pickle(pContained,out)
+    val xml=   Variant.pickler.pickle(pContained)
     inVariantContained must beEqualTo(normalize(xml.document))
 
   }
@@ -113,8 +110,8 @@ class NestedTest  extends PicklerAsserts{
    "unparseInternal" in {
  val r=  Nested("name",pInternal,Internal("l1",111)::Nil)
     
-    val out = PlainOutputStore.empty
-    val xml=   Nested.pickler(Internal.internalPickler).pickle(r,out)
+  
+    val xml=   Nested.pickler(Internal.internalPickler).pickle(r)
     """<rating xmlns="http://schemas.google.com/g/2005">
 <name xmlns="testing-uri">name</name>
 <internal xmlns="nested-uri">
@@ -133,8 +130,8 @@ class NestedTest  extends PicklerAsserts{
  "unparseContained" in {
  val r=  Nested("name",pContained,Contained("l1",111)::Nil)
     
-    val out = PlainOutputStore.empty
-    val xml=   Nested.pickler(Contained.pickler).pickle(r,out)
+  
+    val xml=   Nested.pickler(Contained.pickler).pickle(r)
     """<rating xmlns="http://schemas.google.com/g/2005">
 <name xmlns="testing-uri">name</name>
 <tag xmlns="contained-uri">tagged</tag>
