@@ -23,7 +23,6 @@ case class Nested[T](
     list: List[T]
     ) {}
 
-case class Variant(value:Common)
 
 object Variant{
   import Picklers._

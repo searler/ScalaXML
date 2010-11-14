@@ -33,12 +33,10 @@ class NestedTest  extends PicklerAsserts{
 
 
      "parseVariantInternal" in {
-   
-            
-     val result = Variant.pickler.unpickle(LinearStore(inVariantInternal))
+     val result:PicklerResult[Common] = Variant.pickler.unpickle(LinearStore(inVariantInternal))
      
       result match {
-      case Success(v, _) =>pInternal must beEqualTo(v)
+      case Success(v:Internal, _) =>pInternal must beEqualTo(v)
       case f: NoSuccess  => fail(f toString)
     }
 }
