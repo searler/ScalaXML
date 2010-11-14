@@ -38,13 +38,12 @@ def discrim = elem(TURI,"value", attr("kind",text))
                }
 
   def pickle:PartialFunction[Common, XmlOutputStore => XmlOutputStore] = {
-                          case i:Internal => {o:XmlOutputStore => discrim.pickle("internal",o); Internal.internalPickler.pickle(i,o)}
-                          case c:Contained => {o:XmlOutputStore => discrim.pickle("contained",o);Contained.pickler.pickle(c,o)}
+                          case i:Internal => {o => discrim.pickle("internal",o); Internal.internalPickler.pickle(i,o)}
+                          case c:Contained => {o => discrim.pickle("contained",o);Contained.pickler.pickle(c,o)}
                        }
 
- def pickler = elem(TURI, "variant",
-                       switch(discrim, 
-                         unpickle, pickle)
+ def pickler:Pickler[Common] = elem(TURI, "variant",
+                       switch(discrim, unpickle, pickle)
                      )
 
 }
