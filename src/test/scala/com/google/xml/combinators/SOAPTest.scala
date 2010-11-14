@@ -26,8 +26,13 @@ class SOAPTest  extends PicklerAsserts{
   
    <env:Reason>
      <env:Text xml:lang="en">Sender Timeout</env:Text>
-       <env:Text xml:lang="af">Besender tuid</env:Text>
+      <env:Text xml:lang="af">Besender tuid</env:Text>
    </env:Reason>
+   
+    <env:Node>http://jenkov.com/theNodeThatFailed</env:Node>
+
+  <env:Role>http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver</env:Role>
+   
    <env:Detail>
      <m:MaxTime>P5M</m:MaxTime>
    </env:Detail>    
@@ -36,7 +41,7 @@ class SOAPTest  extends PicklerAsserts{
 </env:Envelope>
 """		
  
-  val pFault = Fault("env:Sender",Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"))
+  val pFault = Fault("env:Sender",Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"),"http://jenkov.com/theNodeThatFailed","http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver")
   
     "parseFault" in {
         val result = Fault.pickler().unpickle(inFault)
@@ -65,6 +70,8 @@ class SOAPTest  extends PicklerAsserts{
 <Text>Sender Timeout</Text>
 <Text>Besender tuid</Text>
 </Reason>
+<Node>http://jenkov.com/theNodeThatFailed</Node>
+<Role>http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver</Role>
 </Fault>
 </Body>
 </Envelope>

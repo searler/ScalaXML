@@ -18,7 +18,7 @@ val SOAP = URI(javax.xml.soap.SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE)
 }
 
 //ignore language code
-case class Fault(code:String,subCode:Option[String],reason:List[String])
+case class Fault(code:String,subCode:Option[String],reason:List[String],node:String,role:String)
 
 object Fault{
  import Picklers._
@@ -26,7 +26,9 @@ object Fault{
 
     def rawPickler = elem( "Envelope", elem( "Body",elem("Fault",
                 elem("Code",elem("Value",text) ~ opt(elem("Subcode",elem("Value",text)))) ~
- elem("Reason", list(elem("Text",text))))
+                elem("Reason", list(elem("Text",text))) ~
+                elem("Node", text) ~
+                elem("Role",text))
      ))
 
     def pickler() = wrapCaseClass(rawPickler) (Fault.apply) (Fault.unapply)
