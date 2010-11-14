@@ -1,9 +1,9 @@
 package com.google.xml.combinators
 
 
-case class SoapDocLiteral[T](contents:T)
+case class DocLiteral[T](contents:T)
 
-object SoapDocLiteral {
+object DocLiteral {
 
   import Picklers._
 
@@ -11,9 +11,9 @@ object SoapDocLiteral {
    
   def rawPickler[T](cp:Pickler[T])  = elem(SOAP , "Envelope", elem(SOAP, "Body", cp))
   
-   private def fromSoapDocLiteral[T](n:SoapDocLiteral[T]) = Some(SoapDocLiteral.unapply[T](n).get)
+   private def fromDocLiteral[T](n:DocLiteral[T]) = Some(DocLiteral.unapply[T](n).get)
 
-   def pickler[T](cp:Pickler[T]): Pickler[SoapDocLiteral[T]] = wrapCaseClass(rawPickler(cp)) (SoapDocLiteral.apply[T]) (fromSoapDocLiteral[T])
+   def pickler[T](cp:Pickler[T]): Pickler[DocLiteral[T]] = wrapCaseClass(rawPickler(cp)) (DocLiteral.apply[T]) (fromDocLiteral[T])
 
    
 }

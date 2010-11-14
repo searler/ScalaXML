@@ -24,10 +24,10 @@ class SOAPTest  extends PicklerAsserts{
                    </env:Body>
                  </env:Envelope>"""
             
-     val result = SoapDocLiteral.pickler(Internal.internalPickler).unpickle(LinearStore(in))
+     val result = DocLiteral.pickler(Internal.internalPickler).unpickle(in)
      
       result match {
-      case Success(v, _) => SoapDocLiteral(Internal("tagged",123)) must beEqualTo(v)
+      case Success(v, _) => DocLiteral(Internal("tagged",123)) must beEqualTo(v)
       case f: NoSuccess  => fail(f toString)
     }
 }
@@ -41,10 +41,10 @@ class SOAPTest  extends PicklerAsserts{
                   </env:Body>
                  </env:Envelope>"""
             
-     val result = SoapDocLiteral.pickler(Contained.pickler).unpickle(LinearStore(in))
+     val result = DocLiteral.pickler(Contained.pickler).unpickle(in)
      
       result match {
-      case Success(v, _) => SoapDocLiteral(Contained("tagged",123)) must beEqualTo(v)
+      case Success(v, _) => DocLiteral(Contained("tagged",123)) must beEqualTo(v)
       case f: NoSuccess  => fail(f toString)
     }
 }
@@ -52,10 +52,10 @@ class SOAPTest  extends PicklerAsserts{
 
 
    "unparseInternal" in {
- val r=  SoapDocLiteral(Internal("tagged",123))
+ val r=  DocLiteral(Internal("tagged",123))
     
     val out = PlainOutputStore.empty
-    val xml=   SoapDocLiteral.pickler(Internal.internalPickler).pickle(r,out)
+    val xml=   DocLiteral.pickler(Internal.internalPickler).pickle(r,out)
     """<Envelope xmlns="http://www.w3.org/2003/05/soap-envelope">
 <Body>
 <internal xmlns="nested-uri">
@@ -70,10 +70,10 @@ class SOAPTest  extends PicklerAsserts{
   }
 
  "unparseContained" in {
- val r=  SoapDocLiteral(Contained("tagged",123))
+ val r=  DocLiteral(Contained("tagged",123))
     
     val out = PlainOutputStore.empty
-    val xml=   SoapDocLiteral.pickler(Contained.pickler).pickle(r,out)
+    val xml=   DocLiteral.pickler(Contained.pickler).pickle(r,out)
     """<Envelope xmlns="http://www.w3.org/2003/05/soap-envelope">
 <Body>
 <tag xmlns="contained-uri">tagged</tag>
