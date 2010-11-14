@@ -12,26 +12,54 @@ import Picklers._
 
 class NestedTest  extends PicklerAsserts{
 
+  val pInternal =  Internal("tagged",123)
+  val pContained = Contained("tagged",123)
 
+ val inVariantInternal = """<variant xmlns="testing-uri">
+<value kind="internal"/>
+<internal xmlns="nested-uri">
+<tag>tagged</tag>
+<value>123</value>
+</internal>
+</variant>
+"""
+
+  val inVariantContained = """<variant xmlns="testing-uri">
+<value kind="contained"/>
+<tag xmlns="contained-uri">tagged</tag>
+<value xmlns="contained-uri">123</value>
+</variant>
+"""
 
 
      "parseVariantInternal" in {
-    val in = """<variant xmlns="testing-uri">
-                   <value kind="internal"/>
-                    <internal xmlns="nested-uri">
-                       <tag>tagged</tag>
-                       <value>123</value>
-                    </internal>
-                 </variant>"""
+   
             
-     val result = Variant.pickler.unpickle(LinearStore(in))
+     val result = Variant.pickler.unpickle(LinearStore(inVariantInternal))
      
       result match {
-      case Success(v, _) =>Internal("tagged",123) must beEqualTo(v)
+      case Success(v, _) =>pInternal must beEqualTo(v)
       case f: NoSuccess  => fail(f toString)
     }
 }
 
+  "unparseVariantInternal" in {
+ 
+    
+    val out = PlainOutputStore.empty
+    val xml=   Variant.pickler.pickle(pInternal,out)
+    inVariantInternal must beEqualTo(normalize(xml.document))
+
+  }
+
+"unparseVariantContaned" in {
+ 
+    
+    val out = PlainOutputStore.empty
+    val xml=   Variant.pickler.pickle(pContained,out)
+    inVariantContained must beEqualTo(normalize(xml.document))
+
+  }
 
 
    
@@ -54,17 +82,12 @@ class NestedTest  extends PicklerAsserts{
 }
 
 "parseVariantContained" in {
-    val in = """<variant xmlns="testing-uri">
-                   <value kind="contained"/>
-                   
-                       <tag xmlns="contained-uri">tagged</tag>
-                       <value xmlns="contained-uri">123</value>
-                 </variant>"""
+  
             
-     val result = Variant.pickler.unpickle(LinearStore(in))
+     val result = Variant.pickler.unpickle(LinearStore(inVariantContained))
      
       result match {
-      case Success(v, _) =>Contained("tagged",123) must beEqualTo(v)
+      case Success(v, _) => pContained must beEqualTo(v)
       case f: NoSuccess  => fail(f toString)
     }
 }
@@ -90,7 +113,7 @@ class NestedTest  extends PicklerAsserts{
 
 
    "unparseInternal" in {
- val r=  Nested("name",Internal("tagged",123),Internal("l1",111)::Nil)
+ val r=  Nested("name",pInternal,Internal("l1",111)::Nil)
     
     val out = PlainOutputStore.empty
     val xml=   Nested.pickler(Internal.internalPickler).pickle(r,out)
@@ -110,7 +133,7 @@ class NestedTest  extends PicklerAsserts{
   }
 
  "unparseContained" in {
- val r=  Nested("name",Contained("tagged",123),Contained("l1",111)::Nil)
+ val r=  Nested("name",pContained,Contained("l1",111)::Nil)
     
     val out = PlainOutputStore.empty
     val xml=   Nested.pickler(Contained.pickler).pickle(r,out)

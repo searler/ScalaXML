@@ -30,18 +30,20 @@ object Variant{
 
  final val TURI = URI("testing-uri")
 
+def discrim = elem(TURI,"value", attr("kind",text))
+
  def unpickle:PartialFunction[String, St =>PicklerResult[Common]] = {  
-                  case "internal" => (ignore(TURI,"value") <~ Internal.internalPickler).unpickle
-                  case "contained" =>  (ignore(TURI,"value") <~ Contained.pickler).unpickle
+                  case "internal" => (discrim <~ Internal.internalPickler).unpickle
+                  case "contained" =>  (discrim <~ Contained.pickler).unpickle
                }
 
   def pickle:PartialFunction[Common, XmlOutputStore => XmlOutputStore] = {
-                          case i:Internal => Internal.internalPickler.pickle(i,_)
-                          case c:Contained => Contained.pickler.pickle(c,_)
+                          case i:Internal => {o:XmlOutputStore => discrim.pickle("internal",o); Internal.internalPickler.pickle(i,o)}
+                          case c:Contained => {o:XmlOutputStore => discrim.pickle("contained",o);Contained.pickler.pickle(c,o)}
                        }
 
  def pickler = elem(TURI, "variant",
-                       switch(elem(TURI,"value", attr("kind",text)), 
+                       switch(discrim, 
                          unpickle, pickle)
                      )
 
