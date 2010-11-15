@@ -145,6 +145,13 @@ def pSetSeq2 =
 </pair>
 """
 
+ val inputEmpty =
+    """<pair xmlns="testing-uri">
+<a>alfa</a>
+<b></b>
+</pair>
+"""
+
 val inputMultiple =
     """<pair xmlns="testing-uri">
 <a>alfa</a>
@@ -235,6 +242,7 @@ val attrInputTURI =
        
 
   val pair = new ~("alfa", "omega")
+  val pairEmpty = new ~("alfa", "")
   val pairString: ~[String,String] = new ~("alfa", "omega")
   val pairInt = new ~("alfa", 12)
   val pairFloat = new ~("alfa", 12.34F)
@@ -345,6 +353,10 @@ val attrInputTURI =
 
 "testSequenceUnpickle" in  {
     assertSucceedsWith("Sequence unpickling failed", pair, input, pSeq2)
+  }
+
+"testSequenceEmptyUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairEmpty, inputEmpty, pSeq2)
   }
 
 "testXml" in  {

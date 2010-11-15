@@ -155,7 +155,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     def unpickle(in: St): PicklerResult[String] = {
       in.acceptText match {
         case (Some(content), in1) => Success(content, in1)
-        case (None, in1)                => Failure("Text node expected", in1)
+        case (None, in1)          => Success("", in1)
       }
     }
   }
