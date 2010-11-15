@@ -41,10 +41,24 @@ class SOAPTest  extends PicklerAsserts{
 </env:Envelope>
 """		
  
-  val pFault = Fault("env:Sender",Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"),Some("http://jenkov.com/theNodeThatFailed"),Some("http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver"))
+  case class Timeouts(maxTime:String)
+    
+  object Timeouts{
+      import Picklers._
+      
+      implicit val MURI = URI("http://www.example.org/timeouts")
+      
+      def rawPickler = elem("MaxTime",text)
+      
+      def pickler = wrapCaseClass(rawPickler)(Timeouts.apply)({v:Timeouts => Some(Timeouts.unapply(v).get)})
+  }  
+ 
+  val pFault = Fault[Timeouts]("env:Sender",Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"),Some("http://jenkov.com/theNodeThatFailed"),Some("http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver"),
+      Some(Timeouts("P5M"))
+  )
   
     "parseFault" in {
-        val result = Fault.pickler().unpickle(inFault)
+        val result = Fault.pickler(Timeouts.pickler).unpickle(inFault)
      
       result match {
       case Success(v, _) => pFault must beEqualTo(v)
@@ -56,7 +70,7 @@ class SOAPTest  extends PicklerAsserts{
 
     
     
-    val xml=   Fault.pickler.pickle(pFault)
+    val xml=   Fault.pickler(Timeouts.pickler).pickle(pFault)
     """<Envelope xmlns="http://www.w3.org/2003/05/soap-envelope">
 <Body>
 <Fault>
@@ -72,6 +86,9 @@ class SOAPTest  extends PicklerAsserts{
 </Reason>
 <Node>http://jenkov.com/theNodeThatFailed</Node>
 <Role>http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver</Role>
+<Detail>
+<MaxTime xmlns="http://www.example.org/timeouts">P5M</MaxTime>
+</Detail>
 </Fault>
 </Body>
 </Envelope>
