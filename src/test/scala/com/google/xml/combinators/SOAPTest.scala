@@ -41,6 +41,28 @@ class SOAPTest  extends PicklerAsserts{
 </env:Envelope>
 """		
  
+ 
+  val inFaultUnit = """<env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope"
+              xmlns:m="http://www.example.org/timeouts"
+              xmlns:xml="http://www.w3.org/XML/1998/namespace">
+ <env:Body>
+  <env:Fault>
+   <env:Code>
+     <env:Value>env:Sender</env:Value>
+     <env:Subcode>
+      <env:Value>m:MessageTimeout</env:Value>
+     </env:Subcode>
+   </env:Code>
+  
+   <env:Reason>
+     <env:Text xml:lang="en">Sender Timeout</env:Text>
+      <env:Text xml:lang="af">Besender tuid</env:Text>
+   </env:Reason>  
+  </env:Fault>
+ </env:Body>
+</env:Envelope>
+"""		
+ 
   case class Timeouts(issue:String,maxTime:String)
     
   object Timeouts{
@@ -57,6 +79,17 @@ class SOAPTest  extends PicklerAsserts{
   val pFault = Fault[Timeouts]("env:Sender",Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"),Some("http://jenkov.com/theNodeThatFailed"),Some("http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver"),
       Some(Timeouts("timing","P5M"))
   )
+  
+   val pFaultUnit = Fault[Unit]("env:Sender",Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"),None,None,None)
+  
+   "parseFaultUnit" in {
+        val result = Fault.pickler(null).unpickle(inFaultUnit)
+     
+      result match {
+      case Success(v, _) => pFaultUnit must beEqualTo(v)
+      case f: NoSuccess  => fail(f toString)
+    }
+}      
   
     "parseFault" in {
         val result = Fault.pickler(Timeouts.pickler).unpickle(inFault)
@@ -90,6 +123,33 @@ class SOAPTest  extends PicklerAsserts{
 <Detail xmlns:ns0="http://www.example.org/timeouts" ns0:issue="timing">
 <MaxTime xmlns="http://www.example.org/timeouts">P5M</MaxTime>
 </Detail>
+</Fault>
+</Body>
+</Envelope>
+""" must beEqualTo(normalize(xml))
+
+  
+  }
+
+
+"unparseFaultUnit" in {
+
+    
+    
+    val xml=   Fault.pickler(null).pickle(pFaultUnit)
+    """<Envelope xmlns="http://www.w3.org/2003/05/soap-envelope">
+<Body>
+<Fault>
+<Code>
+<Value>env:Sender</Value>
+<Subcode>
+<Value>m:MessageTimeout</Value>
+</Subcode>
+</Code>
+<Reason>
+<Text>Sender Timeout</Text>
+<Text>Besender tuid</Text>
+</Reason>
 </Fault>
 </Body>
 </Envelope>
