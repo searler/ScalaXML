@@ -29,7 +29,7 @@ object Fault{
                 elem("Reason", list(elem("Text",text))) ~
                 opt(elem("Node", text)) ~
                 opt(elem("Role",text)) ~
-                opt(elem("Detail",dp)) 
+                opt(elem(SOAP,"Detail",dp)) 
            )
      ))
 

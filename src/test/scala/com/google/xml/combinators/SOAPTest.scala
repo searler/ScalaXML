@@ -33,7 +33,7 @@ class SOAPTest  extends PicklerAsserts{
 
   <env:Role>http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver</env:Role>
    
-   <env:Detail>
+   <env:Detail m:issue="timing">
      <m:MaxTime>P5M</m:MaxTime>
    </env:Detail>    
   </env:Fault>
@@ -41,20 +41,21 @@ class SOAPTest  extends PicklerAsserts{
 </env:Envelope>
 """		
  
-  case class Timeouts(maxTime:String)
+  case class Timeouts(issue:String,maxTime:String)
     
   object Timeouts{
       import Picklers._
       
       implicit val MURI = URI("http://www.example.org/timeouts")
+      val SOAP = URI(javax.xml.soap.SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE)
       
-      def rawPickler = elem("MaxTime",text)
+      def rawPickler = attr(MURI,"issue",text) ~ elem("MaxTime",text)
       
-      def pickler = wrapCaseClass(rawPickler)(Timeouts.apply)({v:Timeouts => Some(Timeouts.unapply(v).get)})
+      def pickler = wrapCaseClass(rawPickler)(Timeouts.apply)(Timeouts.unapply)
   }  
  
   val pFault = Fault[Timeouts]("env:Sender",Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"),Some("http://jenkov.com/theNodeThatFailed"),Some("http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver"),
-      Some(Timeouts("P5M"))
+      Some(Timeouts("timing","P5M"))
   )
   
     "parseFault" in {
@@ -86,7 +87,7 @@ class SOAPTest  extends PicklerAsserts{
 </Reason>
 <Node>http://jenkov.com/theNodeThatFailed</Node>
 <Role>http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver</Role>
-<Detail>
+<Detail xmlns:ns0="http://www.example.org/timeouts" ns0:issue="timing">
 <MaxTime xmlns="http://www.example.org/timeouts">P5M</MaxTime>
 </Detail>
 </Fault>
