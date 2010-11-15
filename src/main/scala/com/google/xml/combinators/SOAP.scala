@@ -18,14 +18,29 @@ object DocLiteral {
 }
 
 //ignore language code
-case class Fault[T](code:String,subCode:Option[String],reason:List[String],node:Option[String],role:Option[String],details:Option[T])
+
+trait FaultCode
+case object VersionMismatch extends FaultCode
+case object MustUnderstand extends FaultCode
+case object DataEncodingUnknown extends FaultCode
+case object Sender extends FaultCode
+case object Receiver extends FaultCode
+
+ object  FaultCodeConvert extends Convert[FaultCode] {   
+    def parse(s:String) =  s match {
+      case "env:Sender" =>Sender
+    }
+    def unparse(v:FaultCode) = v toString
+   }
+
+case class Fault[T](code:FaultCode,subCode:Option[String],reason:List[String],node:Option[String],role:Option[String],details:Option[T])
 
 object Fault{
  import Picklers._
    implicit val SOAP = URI(javax.xml.soap.SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE)
 
     def rawPickler[T](dp:Pickler[T]) = elem( "Envelope", elem( "Body",elem("Fault",
-                elem("Code",elem("Value",text) ~ opt(elem("Subcode",elem("Value",text)))) ~
+                elem("Code",elem("Value",typedValue(FaultCodeConvert)) ~ opt(elem("Subcode",elem("Value",text)))) ~
                 elem("Reason", list(elem("Text",text))) ~
                 opt(elem("Node", text)) ~
                 opt(elem("Role",text)) ~

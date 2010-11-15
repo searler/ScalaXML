@@ -76,11 +76,11 @@ class SOAPTest  extends PicklerAsserts{
       def pickler = wrapCaseClass(rawPickler)(Timeouts.apply)(Timeouts.unapply)
   }  
  
-  val pFault = Fault[Timeouts]("env:Sender",Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"),Some("http://jenkov.com/theNodeThatFailed"),Some("http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver"),
+  val pFault = Fault[Timeouts](Sender,Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"),Some("http://jenkov.com/theNodeThatFailed"),Some("http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver"),
       Some(Timeouts("timing","P5M"))
   )
   
-   val pFaultUnit = Fault[Unit]("env:Sender",Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"),None,None,None)
+   val pFaultUnit = Fault[Unit](Sender,Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"),None,None,None)
   
    "parseFaultUnit" in {
         val result = Fault.pickler(null).unpickle(inFaultUnit)
@@ -109,7 +109,7 @@ class SOAPTest  extends PicklerAsserts{
 <Body>
 <Fault>
 <Code>
-<Value>env:Sender</Value>
+<Value>Sender</Value>
 <Subcode>
 <Value>m:MessageTimeout</Value>
 </Subcode>
@@ -141,7 +141,7 @@ class SOAPTest  extends PicklerAsserts{
 <Body>
 <Fault>
 <Code>
-<Value>env:Sender</Value>
+<Value>Sender</Value>
 <Subcode>
 <Value>m:MessageTimeout</Value>
 </Subcode>
