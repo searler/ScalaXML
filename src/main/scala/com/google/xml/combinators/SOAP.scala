@@ -19,7 +19,7 @@ object DocLiteral {
 
 //ignore language code
 
-trait FaultCode
+sealed trait FaultCode
 case object VersionMismatch extends FaultCode
 case object MustUnderstand extends FaultCode
 case object DataEncodingUnknown extends FaultCode
@@ -27,8 +27,16 @@ case object Sender extends FaultCode
 case object Receiver extends FaultCode
 
  object  FaultCodeConvert extends Convert[FaultCode] {   
-    def parse(s:String) =  s match {
-      case "env:Sender" =>Sender
+    def parse(s:String) =  {
+       //do not care about prefix
+       val pieces = s.split(":")
+       pieces(pieces.length -1)  match {
+          case "Sender" => Sender
+          case "Receiver" => Receiver
+          case "DataEncodingUnknown" => DataEncodingUnknown
+          case "MustUnderstand" => MustUnderstand
+          case "VersionMismatch" => VersionMismatch
+        }
     }
     def unparse(v:FaultCode) = v toString
    }
@@ -40,7 +48,7 @@ object Fault{
    implicit val SOAP = URI(javax.xml.soap.SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE)
 
     def rawPickler[T](dp:Pickler[T]) = elem( "Envelope", elem( "Body",elem("Fault",
-                elem("Code",elem("Value",typedValue(FaultCodeConvert)) ~ opt(elem("Subcode",elem("Value",text)))) ~
+                elem("Code",elem("Value",typedValue(FaultCodeConvert)) ~ opt(elem("Subcode",elem("Value",text)))) ~ //ignore recursion
                 elem("Reason", list(elem("Text",text))) ~
                 opt(elem("Node", text)) ~
                 opt(elem("Role",text)) ~

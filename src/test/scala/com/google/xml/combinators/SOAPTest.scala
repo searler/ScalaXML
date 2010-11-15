@@ -48,7 +48,7 @@ class SOAPTest  extends PicklerAsserts{
  <env:Body>
   <env:Fault>
    <env:Code>
-     <env:Value>env:Sender</env:Value>
+     <env:Value>Sender</env:Value>
      <env:Subcode>
       <env:Value>m:MessageTimeout</env:Value>
      </env:Subcode>
