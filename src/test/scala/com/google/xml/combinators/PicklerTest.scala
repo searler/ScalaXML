@@ -129,6 +129,12 @@ def pSetSeq2 =
         elem(TURI, "a", text)  ~ default(elem(TURI,"b",text),"omega"))
 
 
+val inExtract =
+      """<strings xmlns="testing-uri">
+<str kind="special"/>
+</strings>
+"""    
+
   val inputSpecial =
       """<p:strings xmlns:p="testing-uri">
 <p:st>one</p:st>
@@ -545,15 +551,13 @@ val attrInputTURI =
     normalize(inputRep)  must beEqualTo( normalize(pickled))
   }
 
-"testExtract" in {
-  val in =
-      """<p:strings xmlns:p="testing-uri">
-<p:str kind="special">this is special</p:str>
-</p:strings>
-"""    
-  
-    val expected = "special"
-    assertSucceedsWith("Unpickling when", expected, in, pExtract)
+"testExtractUnPickle" in {
+    assertSucceedsWith("Unpickling when", "special", inExtract, pExtract)
+  }
+
+"testExtractPickle" in  {
+    val pickled = pExtract.pickle("special")
+    normalize(inExtract) must beEqualTo( normalize(pickled))
   }
 
 
