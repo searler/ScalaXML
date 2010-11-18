@@ -4,6 +4,7 @@ trait Common
 
 case class Internal(tag:String,value:Int) extends Common
 case class Contained(tag:String,value:Int) extends Common
+case class Single(tag:String) extends Common
 
 object Internal{
 import Picklers._
@@ -15,6 +16,12 @@ object Contained{
 import Picklers._
   def rawPickler(implicit u:URI) =  elem("tag",text)~elem("value",intVal)
   def pickler = wrapCaseClass(rawPickler(URI("contained-uri"))) (Contained.apply) (Contained.unapply)
+}
+
+object Single{
+import Picklers._
+  def rawPickler(implicit u:URI) =  elem("tag",text)
+  def pickler = wrapCaseClass(rawPickler(URI("contained-uri"))) (Single.apply) (Single.unapply)
 }
 
 case class Nested[T](

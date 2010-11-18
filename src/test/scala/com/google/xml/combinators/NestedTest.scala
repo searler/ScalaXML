@@ -107,6 +107,21 @@ class NestedTest  extends PicklerAsserts{
  
 
 
+ "parseSingle" in {
+    val in = """<rating xmlns="http://schemas.google.com/g/2005">
+                    <name xmlns="testing-uri">name</name>
+                       <tag xmlns="contained-uri">tagged</tag>
+                 </rating>"""
+            
+     val result = Nested.pickler(Single.pickler).unpickle(LinearStore(in))
+     
+      result match {
+      case Success(v, _) => Nested("name",Single("tagged"),Nil) must beEqualTo(v)
+      case f: NoSuccess  => fail(f toString)
+    }
+}
+ 
+
    "unparseInternal" in {
  val r=  Nested("name",pInternal,Internal("l1",111)::Nil)
     
@@ -138,6 +153,20 @@ class NestedTest  extends PicklerAsserts{
 <value xmlns="contained-uri">123</value>
 <tag xmlns="contained-uri">l1</tag>
 <value xmlns="contained-uri">111</value>
+</rating>
+""" must beEqualTo(normalize(xml.document))
+
+  }
+
+"unparseSingle" in {
+ val r=  Nested("name",Single("xx"),Single("l1")::Nil)
+    
+  
+    val xml=   Nested.pickler(Single.pickler).pickle(r)
+    """<rating xmlns="http://schemas.google.com/g/2005">
+<name xmlns="testing-uri">name</name>
+<tag xmlns="contained-uri">xx</tag>
+<tag xmlns="contained-uri">l1</tag>
 </rating>
 """ must beEqualTo(normalize(xml.document))
 

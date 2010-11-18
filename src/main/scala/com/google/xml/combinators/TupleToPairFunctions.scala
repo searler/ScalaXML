@@ -73,6 +73,10 @@ trait TupleToPairFunctions {
   implicit def fun3ToPpairR[A, B, C, D](f: (A, B, C) => D): (~[A, ~[B, C]]) => D = { 
     case a ~ (b ~ c) =>  f(a, b, c)
   } 
+
+
+   implicit def bareUnapply[ B](a: Option[B]) = 
+    Some(a.get)
   
   implicit def tuple2Unapply[ B, C](a: Option[(B, C)]) = 
     Some(new ~(a.get._1, a.get._2))
