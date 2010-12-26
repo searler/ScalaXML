@@ -35,6 +35,7 @@ package com.google.xml.combinators
  * wrap (elem("x", intVal) ~ elem("y", text)) Foo.apply Foo.unapply
  * 
  * @author Iulian Dragos
+ * @author Richard Searle
  */
 trait TupleToPairFunctions {
   /** Convert a binary function to a function of a pair. */

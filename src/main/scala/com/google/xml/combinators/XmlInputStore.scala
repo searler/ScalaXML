@@ -42,6 +42,7 @@ import org.w3c.dom._
  * @see com.google.xml.combinators.LinearStore
  * @see com.google.xml.combinators.RandomAccessStore
  * @author Iulian Dragos
+ * @author Richard Searle
  */
 trait XmlInputStore extends XmlStore {
  

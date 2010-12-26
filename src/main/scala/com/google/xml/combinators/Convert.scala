@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * @author Richard Searle
+ */
 package com.google.xml.combinators
 
 trait Convert[T] {

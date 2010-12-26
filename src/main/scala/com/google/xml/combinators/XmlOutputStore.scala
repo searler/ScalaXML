@@ -34,6 +34,7 @@ import javax.xml.parsers.{DocumentBuilderFactory,DocumentBuilder}
  * random access).
  * 
  * @author Iulian Dragos
+ * @author Richard Searle
  */
 trait XmlOutputStore{
 

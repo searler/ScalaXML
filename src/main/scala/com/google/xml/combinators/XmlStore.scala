@@ -38,6 +38,7 @@ import org.w3c.dom._
  * @see com.google.xml.combinators.XmlInputStore
  * @see com.google.xml.combinators.XmlOutputStore
  * @author Iulian Dragos
+ * @author Richard Searle
  */
 trait XmlStore {
   /** The current XML attributes. */

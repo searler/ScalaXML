@@ -14,7 +14,9 @@
  */
 package com.google.xml.combinators
 
-
+/**
+ * @author Richard Searle
+ */
 case class DocLiteral[T](contents:T)
  
 

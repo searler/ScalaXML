@@ -51,6 +51,7 @@ import com.google.xml.combinators.Converters._
  * input.
  *
  * @author Iulian Dragos (iuliandragos@google.com)
+ * @author Richard Searle
  * @see <a href="http://www.fh-wedel.de/~si/HXmlToolbox/">Haskell XML Toolbox</a>, 
  * @see Andrew Kennedy's
  *      <a href="http://research.microsoft.com/%7Eakenn/fun/">Pickler Combinators</a>, 

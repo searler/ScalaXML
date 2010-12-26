@@ -21,8 +21,9 @@
 
 package com.google.xml.combinators
 
-
-
+/**
+ * @author Richard Searle
+ */
 case class URI(uri:String,prefix:String=null)
   
 

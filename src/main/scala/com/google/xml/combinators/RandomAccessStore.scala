@@ -34,6 +34,8 @@ import org.w3c.dom._
  * the 'acceptElem' method.
  * 
  * @see com.google.xml.combinators.XmlInputStore
+ *
+ * @author Richard Searle
  */
 class RandomAccessStore(myAttrs: NamedNodeMap, myNodes: Seq[Node], 
     level: Int) extends LinearStore(myAttrs, myNodes.toList) {

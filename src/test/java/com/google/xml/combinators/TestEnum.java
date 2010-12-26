@@ -14,6 +14,10 @@
  */
 package com.google.xml.combinators;
 
+/**
+ * @author Richard Searle
+ */
+
 public enum TestEnum {
 ALPHA,
 BETA,

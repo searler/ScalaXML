@@ -40,6 +40,7 @@ import javax.xml.parsers._
  * a set of namespace bindings encountered so far.
  *
  * @author Iulian Dragos (iuliandragos@google.com)
+ * @author Richard Searle
  */
 class LinearStore(ats: NamedNodeMap, nods: List[Node]) 
     extends XmlInputStore {
