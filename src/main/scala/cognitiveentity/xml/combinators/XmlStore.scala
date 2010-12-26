@@ -20,7 +20,7 @@
 */
 
 
-package com.google.xml.combinators
+package cognitiveentity.xml.combinators
 
 import java.io.{InputStream, InputStreamReader}
 
@@ -35,8 +35,8 @@ import org.w3c.dom._
  * An interface for XML stores. It keeps around a collection of attributes, elements and 
  * namespace bindings.
  * 
- * @see com.google.xml.combinators.XmlInputStore
- * @see com.google.xml.combinators.XmlOutputStore
+ * @see cognitiveentity.xml.combinators.XmlInputStore
+ * @see cognitiveentity.xml.combinators.XmlOutputStore
  * @author Iulian Dragos
  * @author Richard Searle
  */

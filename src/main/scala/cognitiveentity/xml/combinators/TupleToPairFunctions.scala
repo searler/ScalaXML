@@ -19,7 +19,7 @@
   Modified by Richard Searle
 */
 
-package com.google.xml.combinators
+package cognitiveentity.xml.combinators
 
 /**
  * Mix in this trait to get implicit conversions between functions of arity 2-7 and 

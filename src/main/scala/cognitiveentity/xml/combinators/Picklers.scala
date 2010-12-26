@@ -19,13 +19,13 @@
   Modified by Richard Searle
 */
 
-package com.google.xml.combinators
+package cognitiveentity.xml.combinators
 
-import com.google.gdata.data.util.DateTime
+import cognitiveentity.xml.util.DateTime
 
 import java.text.ParseException
 import org.w3c.dom._
-import com.google.xml.combinators.Converters._
+import cognitiveentity.xml.combinators.Converters._
 
 /** 
  * A class for XML Pickling combinators.

@@ -15,7 +15,7 @@
  */
 
 
-package com.google.xml.combinators
+package cognitiveentity.xml.combinators
 
 
 case class MapContained(tag:String,value:Int)

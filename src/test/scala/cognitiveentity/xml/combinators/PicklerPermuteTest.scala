@@ -20,7 +20,7 @@
 */
 
 
-package com.google.xml.combinators;
+package cognitiveentity.xml.combinators;
 
 import org.specs._
 

@@ -14,7 +14,7 @@
  */
 
 
-package com.google.gdata.data.util
+package cognitiveentity.xml.util
 
 import scala.util.parsing.combinator.{Parsers, ImplicitConversions}
 import scala.util.parsing.input.CharArrayReader

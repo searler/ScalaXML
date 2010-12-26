@@ -20,7 +20,7 @@
 */
 
 
-package com.google.xml.combinators
+package cognitiveentity.xml.combinators
 
 
 import org.w3c.dom._
@@ -39,8 +39,8 @@ import org.w3c.dom._
  * the accepted element was consumed. Implementers may choose whether to implement 
  * it using mutable state (and return 'this') or use an immutable representation.
  *
- * @see com.google.xml.combinators.LinearStore
- * @see com.google.xml.combinators.RandomAccessStore
+ * @see cognitiveentity.xml.combinators.LinearStore
+ * @see cognitiveentity.xml.combinators.RandomAccessStore
  * @author Iulian Dragos
  * @author Richard Searle
  */

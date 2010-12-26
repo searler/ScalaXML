@@ -16,7 +16,7 @@
 /**
  * @author Richard Searle
  */
-package com.google.xml.combinators
+package cognitiveentity.xml.combinators
 
 trait Convert[T] {
   def parse(str:String):T

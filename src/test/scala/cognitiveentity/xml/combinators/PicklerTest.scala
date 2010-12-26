@@ -20,7 +20,7 @@
 */
 
    
-package com.google.xml.combinators
+package cognitiveentity.xml.combinators
 
 import org.specs._
 
@@ -114,7 +114,7 @@ def pSetSeq2 =
     elem(TURI, "pair", 
         elem(TURI, "a", text) ~ elem(TURI, "b", intVal))
 
- import com.google.xml.combinators.Converters._
+ import cognitiveentity.xml.combinators.Converters._
  def pSeq2IntType: Pickler[String ~ Int] = 
     elem(TURI, "pair", 
         elem(TURI, "a", text) ~ elem(TURI, "b", typedValue))

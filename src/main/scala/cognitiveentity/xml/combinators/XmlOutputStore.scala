@@ -19,7 +19,7 @@
   Modified by Richard Searle
 */
 
-package com.google.xml.combinators
+package cognitiveentity.xml.combinators
 
 import scala.collection._
 

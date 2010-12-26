@@ -1,5 +1,4 @@
-/* Copyright (c) 2008 Google Inc.
- * Copyright (c) 2010 Richard Searle
+/* Copyright (c) 2010 Richard Searle
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +13,14 @@
  * limitations under the License.
  */
 
-/*
-  Extracted from gdata-scala
-  Modified by Richard Searle
-*/
-
-package com.google.xml.combinators
-
+import sbt._
 /**
  * @author Richard Searle
  */
-case class URI(uri:String,prefix:String=null)
-  
+class ScalaXMLProject(info: ProjectInfo) extends DefaultProject(info)
+{
+ val specs = "org.scala-tools.testing" % "specs_2.8.1" % "1.6.6"
 
+ override def compileOrder = CompileOrder.JavaThenScala
+
+}

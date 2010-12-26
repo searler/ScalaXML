@@ -19,7 +19,7 @@
   Modified by Richard Searle
 */
 
-package com.google.xml.combinators
+package cognitiveentity.xml.combinators
 
 
 import org.w3c.dom._
@@ -33,7 +33,7 @@ import org.w3c.dom._
  * namespace) to XML elements. This allows access in constant time implementation of
  * the 'acceptElem' method.
  * 
- * @see com.google.xml.combinators.XmlInputStore
+ * @see cognitiveentity.xml.combinators.XmlInputStore
  *
  * @author Richard Searle
  */

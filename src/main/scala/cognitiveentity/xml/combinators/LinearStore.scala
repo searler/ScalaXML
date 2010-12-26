@@ -19,7 +19,7 @@
   Modified by Richard Searle
 */
 
-package com.google.xml.combinators
+package cognitiveentity.xml.combinators
 
 import java.io.{Reader,  StringReader}
 import org.xml.sax.InputSource

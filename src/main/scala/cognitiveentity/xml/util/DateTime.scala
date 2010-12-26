@@ -14,7 +14,7 @@
  */
 
 
-package com.google.gdata.data.util
+package cognitiveentity.xml.util
 
 import java.util.{Date, Calendar, GregorianCalendar, TimeZone}
  
