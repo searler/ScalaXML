@@ -39,7 +39,7 @@ class XMLDumper(target:ContentHandler){
 	    {  
 	      x match {
 		case c: Comment => lexical.map(_.comment(c.commentText.toCharArray,0,c.commentText.length))
-		case a: PCData => lexical.map { lex=> lex.startCDATA; characters(a); lex.endCDATA}
+		case a: PCData => lexical.map {lex=> lex.startCDATA; characters(a); lex.endCDATA}
 		case a: Atom[_] =>  characters(a)
 		case e: EntityRef =>  characters(e)
 		case p: ProcInstr => target.processingInstruction(p.target,p.proctext)
