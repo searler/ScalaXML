@@ -26,7 +26,7 @@ import org.xml.sax.helpers._
 import scala.xml.Utility._
 
 class XMLDumper(target:ContentHandler){
-    val lexical = if(target.isInstanceOf[LexicalHandler]) target.asInstanceOf[LexicalHandler] else null
+    val lexical:Option[LexicalHandler] = if(target.isInstanceOf[LexicalHandler]) Some(target.asInstanceOf[LexicalHandler]) else None
     
      def toXML(x: Node){
        target.startDocument
@@ -38,8 +38,8 @@ class XMLDumper(target:ContentHandler){
 	    pscope: NamespaceBinding)
 	    {  
 	      x match {
-		case c: Comment => if (lexical != null) lexical.comment(c.commentText.toCharArray,0,c.commentText.length)
-		case a: PCData if (lexical != null) => {lexical.startCDATA; characters(a); lexical.endCDATA}
+		case c: Comment => lexical.map(_.comment(c.commentText.toCharArray,0,c.commentText.length))
+		case a: PCData => lexical.map { lex=> lex.startCDATA; characters(a); lex.endCDATA}
 		case a: Atom[_] =>  characters(a)
 		case e: EntityRef =>  characters(e)
 		case p: ProcInstr => target.processingInstruction(p.target,p.proctext)
