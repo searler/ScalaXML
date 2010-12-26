@@ -75,7 +75,13 @@ def pUnpicklePartial:PartialFunction[String, St =>PicklerResult[String~String]] 
          switch(elem(TURI,"str", attr("kind", text)), pUnpicklePartial, pPicklePartial)
          )(TURI)
 
-  
+   def pWhen = elem("strings", 
+      ((when(elem(TURI,"str", const(attr("kind", text), "special")), elem(TURI,"str", text)) |
+       when(elem(TURI,"str", const(attr("kind", text), "other")), elem(TURI,"str", text)))
+       ~ elem(TURI,"st", text) ~ elem(TURI,"a", text) ~ elem(TURI,"b", text)))(TURI)
+
+  def pPath = elem(TURI,"Profile", elem(TURI,"entry", elem(TURI,"value",text)))
+  def pPathWhen = elem(TURI,"Profile", when(elem(TURI,"entry", const(elem(TURI,"kind",text),"b")),elem(TURI,"entry",ignore(TURI,"kind")~>elem(TURI,"value",text))))
 
   def pSeq2 = 
     elem(TURI, "pair", 
@@ -380,6 +386,33 @@ val attrInputTURI =
        normalize(input) must beEqualTo(normalize(pickled))
   }
 
+"testPath" in  {
+   val in="""<Profile  xmlns="testing-uri"> 
+<entry>
+<value>v</value>
+</entry>
+</Profile>
+"""
+    assertSucceedsWith("Path unpickling failed", "v", in, pPath)
+  }
+
+"testPathWhen" in  {
+   val in="""<Profile  xmlns="testing-uri"> 
+<entry>
+<kind>a</kind>
+<value>v</value>
+
+</entry>
+<entry>
+<kind>b</kind>
+<value>w</value>
+
+</entry>
+</Profile>
+"""
+    assertSucceedsWith("Path unpickling failed", "w", in, pPathWhen)
+  }
+
 "testListSequenceUnpickle" in  {
     assertSucceedsWith("Sequence unpickling failed", pairListSingle, input, pListSeq2)
   }
@@ -589,6 +622,47 @@ val attrInputTURI =
     assertSucceedsWith("Unpickling when", expected, in, pSwitch)
   }
 
+   "testWhen" in {
+    val expected = new ~("this is special", "one") ~ "a" ~ "b"
+    assertSucceedsWith("Unpickling when", expected, inputSpecial, pWhen)
+  }
+
+
+"testWhenNoSpecial" in {
+  
+    val input =
+      """<p:strings xmlns:p="testing-uri">
+<p:st>one</p:st>
+<p:str kind="other">not special</p:str>
+<p:a>a</p:a>
+<p:b>b</p:b>
+<p:str kind="xxx">this is special</p:str>
+
+</p:strings>
+"""    
+    val expected = new ~("not special", "one") ~ "a" ~ "b"
+    assertSucceedsWith("Unpickling when", expected, input, pWhen)
+  }
+  
+  
+  "testWhenInterleaved" in {
+    implicit val ns = URI("testing-uri")
+    val input =
+      """<p:strings xmlns:p="testing-uri">
+<p:b>b</p:b>
+<p:a>a</p:a>
+<p:str>one</p:str>
+<p:str kind="special">this is special</p:str>
+</p:strings>
+"""
+    val pickler = interleaved("strings", 
+      (when(elem("str", const(attr("kind", text), "special")), elem("str", text))
+       ~ elem("str", text) ~ elem("a", text) ~ elem("b", text)))
+      
+    val expected = new ~("this is special", "one") ~ "a" ~ "b"
+    assertSucceedsWith("Unpickling when", expected, input, pickler)
+  }
+ 
  
   
 

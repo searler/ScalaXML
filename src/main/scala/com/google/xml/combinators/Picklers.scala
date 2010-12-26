@@ -145,6 +145,48 @@ object Picklers extends AnyRef with TupleToPairFunctions {
 
   }
 
+/**
+    * Runs 'pb' unpickler on the first element that 'pa' successfully parses. It
+    * is more general than 'interleaved', which uses only the element name to decide 
+    * the input on which to run a pickler. 'pa' can be arbitrarily complex.
+    * 
+    * Example:
+    *   when(elem("feedLink", const(attr("rel", "#kinds"), rel)), kindsPickler)
+    * 
+    * will look for the first 'feedLink' element with an attribute equal to '#kinds'
+    * and then run 'kindsPickler' on that element.
+    */
+   def when[A, B](pa: => Pickler[A], pb: => Pickler[B]): Pickler[B] = new Pickler[B] {
+     def pickle(v: B, in: XmlOutputStore) = pb.pickle(v, in)
+     
+     def unpickle(in: St) = {
+       var lastFailed: Option[NoSuccess] = None
+       
+       val target = in.nodes find {
+         case e: Element => 
+           pa.unpickle(LinearStore(e)) match {
+             case _: Success[_] => true
+             case f: NoSuccess => lastFailed = Some(f); false 
+           }
+         case _ => false
+       }
+       
+       target match {
+         case Some(e: Element) => 
+           pb.unpickle(LinearStore(e)) match {
+             case Success(v1, in1) =>
+               Success(v1, in.mkState(in.attrs, in.nodes.toList.filterNot(_ == e)))
+             case f: NoSuccess =>
+               Failure(f.msg, in)
+           }
+         case None => 
+           if (lastFailed.isDefined)
+             lastFailed.get
+           else
+             Failure("Expected at least one element", in)
+       }
+     }
+   }
  
 
   /** A basic pickler that serializes a value to a string and back.  */

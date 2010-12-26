@@ -2,13 +2,9 @@ package com.google.xml.combinators
 
 import org.specs._
 
-
-
 import scala.xml.PrettyPrinter
 
 import Picklers._
-
-
 
 class SOAPTest  extends PicklerAsserts{
 
@@ -40,7 +36,6 @@ class SOAPTest  extends PicklerAsserts{
  </env:Body>
 </env:Envelope>
 """		
- 
  
   val inFaultUnit = """<env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope"
               xmlns:m="http://www.example.org/timeouts"
@@ -101,9 +96,7 @@ class SOAPTest  extends PicklerAsserts{
 }      
 
  "unparseFault" in {
-
-    
-    
+   
     val xml=   Fault.pickler(Timeouts.pickler).pickle(pFault)
     """<Envelope xmlns="http://www.w3.org/2003/05/soap-envelope">
 <Body>
@@ -127,14 +120,9 @@ class SOAPTest  extends PicklerAsserts{
 </Body>
 </Envelope>
 """ must beEqualTo(normalize(xml))
-
-  
   }
 
-
 "unparseFaultUnit" in {
-
-    
     
     val xml=   Fault.pickler(null).pickle(pFaultUnit)
     """<Envelope xmlns="http://www.w3.org/2003/05/soap-envelope">
@@ -154,10 +142,8 @@ class SOAPTest  extends PicklerAsserts{
 </Body>
 </Envelope>
 """ must beEqualTo(normalize(xml))
-
   
   }
-
 
      "parseInternal" in {
     val in = """<env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope">
@@ -194,12 +180,9 @@ class SOAPTest  extends PicklerAsserts{
     }
 }
  
-
-
    "unparseInternal" in {
  val r=  DocLiteral(Internal("tagged",123))
-    
-    
+       
     val xml=   DocLiteral.pickler(Internal.internalPickler).pickle(r)
     """<Envelope xmlns="http://www.w3.org/2003/05/soap-envelope">
 <Body>
@@ -215,10 +198,9 @@ class SOAPTest  extends PicklerAsserts{
   }
 
  "unparseContained" in {
- val r=  DocLiteral(Contained("tagged",123))
-    
+    val r =  DocLiteral(Contained("tagged",123))
     val out = PlainOutputStore.empty
-    val xml=   DocLiteral.pickler(Contained.pickler).pickle(r,out)
+    val xml =   DocLiteral.pickler(Contained.pickler).pickle(r,out)
     """<Envelope xmlns="http://www.w3.org/2003/05/soap-envelope">
 <Body>
 <tag xmlns="contained-uri">tagged</tag>
@@ -227,21 +209,16 @@ class SOAPTest  extends PicklerAsserts{
 </Envelope>
 """ must beEqualTo(normalize(xml.document)) 
 
-  
    checkBody( "\ntagged\n123\n",xml.document)
   }
 
   def checkBody(expected:String,xml:org.w3c.dom.Document){
      import javax.xml.soap._
-  import java.io._
+     import java.io._
 
-  val factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL)
-  val message = factory.createMessage(new MimeHeaders(),new ByteArrayInputStream(normalize(xml).getBytes))
-  println(message)
-   expected must beEqualTo(message.getSOAPBody.getTextContent)
+     val factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL)
+     val message = factory.createMessage(new MimeHeaders(),new ByteArrayInputStream(normalize(xml).getBytes))
+     expected must beEqualTo(message.getSOAPBody.getTextContent)
   }
       
-  
-  
-
 }
