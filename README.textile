@@ -1,0 +1,18 @@
+h1. Introduction
+
+This code is derived from "gdata-scala":http://code.google.com/p/gdata-scala-client/
+
+The following modifications were applied:
+# Use Scala 2.8.1
+# Use Java DOM rather than SAX xml processing
+# Remove constructs that were useful for original purpose but not generally applicable
+# Support for additional XML structures
+# More tests
+
+h1. Documentation
+The "original documentation":http://code.google.com/p/gdata-scala-client/wiki/DevelopersGuide 
+is still relevant and very helpful to understand the core principles. "ticket508":http://lampsvn.epfl.ch/trac/scala/ticket/508
+is no longer a concern.
+
+The Java DOM provides zero-cost interoperability with the wider Java ecosystem. 
+
