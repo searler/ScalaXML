@@ -10,6 +10,7 @@ The following modifications were applied:
 # More tests
 
 h1. Documentation
+
 The "original documentation":http://code.google.com/p/gdata-scala-client/wiki/DevelopersGuide 
 is still relevant and very helpful to understand the core principles. "ticket508":http://lampsvn.epfl.ch/trac/scala/ticket/508
 is no longer a concern.
