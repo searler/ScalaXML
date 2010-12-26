@@ -1,5 +1,17 @@
 h1. Introduction
 
+The XML functionality built into Scala is very useful but limited.
+It can only interoperate with the standard Java XML tools via the serialized representation,
+which is too costly to be generally useful. The xpath implementation is a subset of the
+full XPath, which limits reuse of existing code. 
+
+This project contains tools to allow usage of the Java XML tooling within Scala. 
+
+Currently there are three components
+
+
+h2. Combinators
+
 This code is derived from "gdata-scala":http://code.google.com/p/gdata-scala-client/
 
 The following modifications were applied:
@@ -9,9 +21,21 @@ The following modifications were applied:
 # Support for additional XML structures
 # More tests
 
-h1. Documentation
+The "original documentation":http://code.google.com/p/gdata-scala-client/wiki/DevelopersGuide is still relevant and very helpful to understand the core principles.
+"ticket508":http://lampsvn.epfl.ch/trac/scala/ticket/508 is no longer a concern.
 
-The "original documentation":http://code.google.com/p/gdata-scala-client/wiki/DevelopersGuide is still relevant and very helpful to understand the core principles. "ticket508":http://lampsvn.epfl.ch/trac/scala/ticket/508 is no longer a concern.
+h2. XPath
 
-The Java DOM provides zero-cost interoperability with the wider Java ecosystem. 
+Provides full access to the Java XPath API, using Scala idioms
 
+See "implicits":http://cognitiveentity.wordpress.com/2010/09/07/scala-implicits-to-simplify-xpathfunction/ and "primitives":http://cognitiveentity.wordpress.com/2010/09/07/scala-implicits-to-simplify-xpathfunction/
+
+See 
+
+h2. SAX Interoperation 
+
+Provides ContentHandlers to map between SAX events and the builtin Scala XML support. 
+
+These allow the serialized representation to be interchanged in the most efficient and flexible manner.
+
+See "event creation":http://cognitiveentity.wordpress.com/2010/09/02/converting-scala-xml-into-sax-events/  and "consuming events":http://cognitiveentity.wordpress.com/2010/08/29/scala-xmlloader-as-contenthandler/

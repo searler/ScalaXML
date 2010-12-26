@@ -75,8 +75,8 @@ class XMLDumper(target:ContentHandler){
 	      var natt = node.attributes
 	      while(natt != null){
 		natt match  {
-		case pa:PrefixedAttribute =>  atts.addAttribute(null,pa.key,pa.pre+":"+pa.key,"CDATA",toString(pa.value))
-		case ua:UnprefixedAttribute =>  atts.addAttribute(null,ua.key,ua.key,"CDATA",toString(ua.value))
+		  case pa:PrefixedAttribute =>  atts.addAttribute(null,pa.key,pa.pre+":"+pa.key,"CDATA",toString(pa.value))
+		  case ua:UnprefixedAttribute =>  atts.addAttribute(null,ua.key,ua.key,"CDATA",toString(ua.value))
 		  case Null =>  //ignored
 		}
 		
@@ -88,9 +88,9 @@ class XMLDumper(target:ContentHandler){
 	  private  def toString(ns:Seq[Node]) = {
 	      val sb = new StringBuilder
 	      ns foreach {_ match { 
-		case a: Atom[_] => sb.append(a.text)
-		case e:EntityRef => sb.append(e.text)
-	      }
+		   case a: Atom[_] => sb.append(a.text)
+		   case e:EntityRef => sb.append(e.text)
+	         }
 	      }
 	      sb.toString
 	    }
