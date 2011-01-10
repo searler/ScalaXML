@@ -84,6 +84,9 @@ def pUnpicklePartial:PartialFunction[String, St =>PicklerResult[String~String]] 
   def pPath = elem(TURI,"Profile", elem(TURI,"entry", elem(TURI,"value",text)))
   def pPathWhen = elem(TURI,"Profile", when(elem(TURI,"entry", const(elem(TURI,"kind",text),"b")),elem(TURI,"entry",ignore(TURI,"kind")~>elem(TURI,"value",text))))
 
+   def pMixed = 
+    elem(TURI, "pair", text | elem(TURI, "a", text) )
+
   def pSeq2 = 
     elem(TURI, "pair", 
         elem(TURI, "a", text) ~ elem(TURI, "b", text))
@@ -156,6 +159,11 @@ val inExtract =
 <a>alfa</a>
 <b>omega</b>
 </pair>
+"""
+
+
+val mixed =
+    """<pair xmlns="testing-uri">Mixed</pair>
 """
 
  val inputEmpty =
@@ -254,6 +262,7 @@ val attrInputTURI =
 """
        
 
+ 
   val pair = new ~("alfa", "omega")
   val pairEmpty = new ~("alfa", "")
   val pairString: ~[String,String] = new ~("alfa", "omega")
@@ -363,6 +372,15 @@ val attrInputTURI =
  val pickled = pSeq2Opt.pickle(pairOptNone)
        normalize(inputOpt) must beEqualTo(normalize(pickled))
  }
+
+"testMixedUnpickleText" in  {
+    assertSucceedsWith("testMixedUnpickleText", "Mixed", mixed, pMixed)
+  }
+
+"testMixedUnpicklElem" in  {
+    assertSucceedsWith("testMixedUnpickleText", "alfa", input, pMixed)
+  }
+
 
 "testSequenceUnpickle" in  {
     assertSucceedsWith("Sequence unpickling failed", pair, input, pSeq2)
