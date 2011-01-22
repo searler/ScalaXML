@@ -16,7 +16,7 @@ This code is derived from "gdata-scala":http://code.google.com/p/gdata-scala-cli
 
 The following modifications were applied:
 # Use Scala 2.8.1
-# Use Java DOM rather than SAX xml processing
+# Use Java DOM rather than Scala xml processing
 # Remove constructs that were useful for original purpose but not generally applicable
 # Support for additional XML structures
 # More tests
