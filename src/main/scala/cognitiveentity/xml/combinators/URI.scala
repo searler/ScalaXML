@@ -23,6 +23,9 @@ package cognitiveentity.xml.combinators
 
 /**
  * @author Richard Searle
+ *
+ * Represents a URI
+ *
  */
 case class URI(uri:String,prefix:String=null)
   

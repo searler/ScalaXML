@@ -18,16 +18,31 @@
  */
 package cognitiveentity.xml.combinators
 
+/**
+ * Define the standard pickler interface
+ */
 trait Convert[T] {
   def parse(str:String):T
   def unparse(v:T):String
 }
 
+/**
+ * Pickler for Java enumeration
+ */
 class EnumConvert[E <: Enum[E]](c:Class[E]) extends Convert[E]{
    def parse(s:String) =  Enum.valueOf(c,s).asInstanceOf[E]
    def unparse(v:E) = v name
 }
 
+/**
+ * Define a collection of standard picklers, as implicits
+ * so they are auto-magically used where necessary.
+ *
+ * It is sufficient to use typedValue in the parser definition, and
+ * the appropriate converter is used based on the type defined in
+ * case class. This avoids redundantly specifying the type in
+ * two places.
+ */
 object Converters{
 
   implicit object  IntConvert extends Convert[Int] {   
@@ -35,12 +50,12 @@ object Converters{
     def unparse(v:Int) = v toString
    }
 
-   implicit object  FloatConvert extends Convert[Float] {   
+  implicit object  FloatConvert extends Convert[Float] {   
     def parse(s:String) =  s toFloat 
     def unparse(v:Float) = v toString
    }
 
- implicit object  DoubleConvert extends Convert[Double] {   
+  implicit object  DoubleConvert extends Convert[Double] {   
     def parse(s:String) =  s toDouble
     def unparse(v:Double) = v toString
    }
@@ -50,10 +65,8 @@ object Converters{
     def unparse(v:Boolean) = v toString
    }
 
-    implicit object  StringConvert extends Convert[String] {   
+   implicit object  StringConvert extends Convert[String] {   
     def parse(s:String) =  s
     def unparse(v:String) = v
    }
-
- 
 }

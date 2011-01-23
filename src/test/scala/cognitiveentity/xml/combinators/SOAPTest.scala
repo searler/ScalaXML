@@ -114,6 +114,13 @@ class SOAPTest  extends PicklerAsserts{
  </env:Body>
 </env:Envelope>
 """		
+
+  val  bareIntegerInput =  """<Envelope xmlns="http://www.w3.org/2003/05/soap-envelope">
+<Body>123</Body>
+</Envelope>
+"""
+
+
   //The application specific SOAP fault Detail 
   case class Timeouts(issue:String,maxTime:String)
     
@@ -306,12 +313,19 @@ class SOAPTest  extends PicklerAsserts{
      val r =  DocLiteral(123)
      val out = PlainOutputStore.empty
      val xml =   DocLiteral.pickler(intVal).pickle(r,out)
-    """<Envelope xmlns="http://www.w3.org/2003/05/soap-envelope">
-<Body>123</Body>
-</Envelope>
-""" must beEqualTo(normalize(xml.document)) 
+     bareIntegerInput must beEqualTo(normalize(xml.document)) 
 
      checkBody( "123",xml.document)
+   } 
+
+   //Parse DocLiteral of a bare integer
+   "parseInt" in {
+     val result = DocLiteral.pickler(intVal).unpickle(bareIntegerInput)
+     
+     result match {
+        case Success(v, _) => DocLiteral(123) must beEqualTo(v)
+        case f: NoSuccess  => fail(f toString)
+     }
    } 
 
   "faultCodeConvertGood" in {
