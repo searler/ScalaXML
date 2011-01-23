@@ -14,23 +14,25 @@
  */
 package cognitiveentity.xml.combinators
 
-
-
-case class  EnumContainer(s:String,e:TestEnum)
+/**
+ * @author Richard Searle
+ *
+ * Demonstrate pickling of a Java enum
+ */
+case class EnumContainer(s:String,e:TestEnum)
 
 object EnumContainer{
  import Picklers._
 
+ //defines the converter for the typeValue reference
  implicit object EnumConverter extends EnumConvert(classOf[TestEnum])
 
-  final val TURI = URI("testing-uri")
-  def rawPickler  = 
+  private final val TURI = URI("testing-uri")
+  private def rawPickler  = 
     elem("container", 
-      elem("name",text)(TURI)  ~ elem("enum", typedValue)(TURI)
+         elem("name",text)(TURI)  ~ elem("enum", typedValue)(TURI)
         )(TURI)
-  
-   
-
-def pickler: Pickler[EnumContainer] = wrapCaseClass(rawPickler) (EnumContainer.apply) (EnumContainer.unapply)
+     
+  def pickler: Pickler[EnumContainer] = wrapCaseClass(rawPickler) (EnumContainer.apply) (EnumContainer.unapply)
 
 }

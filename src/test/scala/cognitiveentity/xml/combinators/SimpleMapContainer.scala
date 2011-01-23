@@ -17,38 +17,37 @@
 
 package cognitiveentity.xml.combinators
 
+/**
+ * @author Richard Searle
+ *
+ * Test codes for a a Map of MapContained instances
+ */
 
+// value in the Map
 case class MapContained(tag:String,value:Int)
 
 object MapContained{
-import Picklers._
+   import Picklers._
 
- final val TURI = URI("testing-uri")
-  def rawPickler =  elem("key",text)(TURI)~elem("value",intVal)(TURI)
-  def pickler = wrapCaseClass(rawPickler) (MapContained.apply) (MapContained.unapply)
+   private final val TURI = URI("testing-uri")
+   private def rawPickler =  elem("key",text)(TURI) ~ elem("value",intVal)(TURI)
+   def pickler = wrapCaseClass(rawPickler) (MapContained.apply) (MapContained.unapply)
 }
 
-
+//
+//domain object containing a Map
 case class SimpleMapContainer(
     name:String,
-    values: Map[String,MapContained]
-    ) {
-}
-
+    values:Map[String,MapContained]) 
 
 object SimpleMapContainer {
-
   import Picklers._
 
-  final val TURI = URI("testing-uri")
-  def rawPickler  = 
+  private final val TURI = URI("testing-uri")
+  private def rawPickler  = 
     elem("container", 
       elem("name",text)(TURI)  ~ map(keyOnly(elem(TURI, "key", text), MapContained.pickler))
         )(TURI)
   
-   
-
-def pickler: Pickler[SimpleMapContainer] = wrapCaseClass(rawPickler) (SimpleMapContainer.apply) (SimpleMapContainer.unapply)
-
-   
+   def pickler: Pickler[SimpleMapContainer] = wrapCaseClass(rawPickler) (SimpleMapContainer.apply) (SimpleMapContainer.unapply)
 }

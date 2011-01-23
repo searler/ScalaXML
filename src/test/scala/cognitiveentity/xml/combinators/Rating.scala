@@ -21,29 +21,24 @@
 
 package cognitiveentity.xml.combinators
 
-
+/**
+ * Derived from gdata-scala test case
+ */
 case class Rating(
     name:String,
     count:Int,
-    min: Int, 
+    min:Int, 
     cost:Int,
-    max: List[Int]
-    ) {
-}
+    max:List[Int]) 
 
 object Rating {
+   import Picklers._
 
-  import Picklers._
-
-  final val TURI = URI("testing-uri")
-  def rawPickler  = 
+   private final val TURI = URI("testing-uri")
+   private def rawPickler  = 
     elem("rating", 
-      elem("name",text)(TURI)  ~ attr("count", intVal) ~  attr("min", intVal) ~  default(attr("cost", intVal),666) ~ list(elem("max", intVal)(TURI))
+         elem("name",text)(TURI)  ~ attr("count", intVal) ~  attr("min", intVal) ~  default(attr("cost", intVal),666) ~ list(elem("max", intVal)(TURI))
         )(URI("http://schemas.google.com/g/2005"))
   
-   
-
-def pickler: Pickler[Rating] = wrapCaseClass(rawPickler) (Rating.apply) (Rating.unapply)
-
-   
+   def pickler: Pickler[Rating] = wrapCaseClass(rawPickler) (Rating.apply) (Rating.unapply) 
 }

@@ -16,9 +16,10 @@ package cognitiveentity.xml.combinators;
 
 /**
  * @author Richard Searle
+ *
+ * Enumeration used to illustrate pickling
  */
-
 public enum TestEnum {
-ALPHA,
-BETA,
-CHARLIE}
+   ALPHA,
+   BETA,
+   CHARLIE}

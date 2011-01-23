@@ -129,7 +129,7 @@ class SOAPTest  extends PicklerAsserts{
       def pickler = wrapCaseClass(rawPickler)(Timeouts.apply)(Timeouts.unapply)
   }  
  
-  //Faul with details
+  //Fault with details
   val pFault = Fault[Timeouts](Sender,Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"),Some("http://jenkov.com/theNodeThatFailed"),Some("http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver"),
       Some(Timeouts("timing","P5M"))
   )

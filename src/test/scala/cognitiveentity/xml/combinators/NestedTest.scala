@@ -23,13 +23,15 @@ import scala.xml.PrettyPrinter
 import Picklers._
 
 
-
+/**
+ * @author Richard Searle
+ */
 class NestedTest  extends PicklerAsserts{
 
   val pInternal =  Internal("tagged",123)
   val pContained = Contained("tagged",123)
 
- val inVariantInternal = """<variant xmlns="testing-uri">
+  val inVariantInternal = """<variant xmlns="testing-uri">
 <value kind="internal"/>
 <internal xmlns="nested-uri">
 <tag>tagged</tag>
@@ -45,36 +47,27 @@ class NestedTest  extends PicklerAsserts{
 </variant>
 """
 
-
-     "parseVariantInternal" in {
-     val result:PicklerResult[Common] = Variant.pickler.unpickle(LinearStore(inVariantInternal))
+   "parseVariantInternal" in {
+        val result:PicklerResult[Common] = Variant.pickler.unpickle(LinearStore(inVariantInternal))
      
-      result match {
-      case Success(v:Internal, _) =>pInternal must beEqualTo(v)
-      case f: NoSuccess  => fail(f toString)
-    }
-}
+         result match {
+            case Success(v:Internal, _) =>pInternal must beEqualTo(v)
+            case f: NoSuccess  => fail(f toString)
+         }
+   }
 
   "unparseVariantInternal" in {
- 
-    
-  
-    val xml=   Variant.pickler.pickle(pInternal)
+    val xml = Variant.pickler.pickle(pInternal)
     inVariantInternal must beEqualTo(normalize(xml.document))
-
   }
 
-"unparseVariantContaned" in {
-    val xml=   Variant.pickler.pickle(pContained)
+  "unparseVariantContaned" in {
+    val xml = Variant.pickler.pickle(pContained)
     inVariantContained must beEqualTo(normalize(xml.document))
-
   }
 
-
-   
-
-     "parseInternal" in {
-    val in = """<rating xmlns="http://schemas.google.com/g/2005">
+  "parseInternal" in {
+     val in = """<rating xmlns="http://schemas.google.com/g/2005">
                     <name xmlns="testing-uri">name</name>
                     <internal xmlns="nested-uri">
                        <tag>tagged</tag>
@@ -82,22 +75,21 @@ class NestedTest  extends PicklerAsserts{
                     </internal>
                  </rating>"""
             
-     val result = Nested.pickler(Internal.internalPickler).unpickle(LinearStore(in))
+      val result = Nested.pickler(Internal.internalPickler).unpickle(LinearStore(in))
      
       result match {
-      case Success(v, _) => Nested("name",Internal("tagged",123),Nil) must beEqualTo(v)
-      case f: NoSuccess  => fail(f toString)
-    }
+         case Success(v, _) => Nested("name",Internal("tagged",123),Nil) must beEqualTo(v)
+         case f: NoSuccess  => fail(f toString)
+       }
 }
 
-"parseVariantContained" in {
-  
-            
+   "parseVariantContained" in {
+          
      val result = Variant.pickler.unpickle(LinearStore(inVariantContained))
      
       result match {
-      case Success(v, _) => pContained must beEqualTo(v)
-      case f: NoSuccess  => fail(f toString)
+         case Success(v, _) => pContained must beEqualTo(v)
+         case f: NoSuccess  => fail(f toString)
     }
 }
 
@@ -114,13 +106,11 @@ class NestedTest  extends PicklerAsserts{
      val result = Nested.pickler(Contained.pickler).unpickle(LinearStore(in))
      
       result match {
-      case Success(v, _) => Nested("name",Contained("tagged",123),Nil) must beEqualTo(v)
-      case f: NoSuccess  => fail(f toString)
+         case Success(v, _) => Nested("name",Contained("tagged",123),Nil) must beEqualTo(v)
+         case f: NoSuccess  => fail(f toString)
     }
 }
  
-
-
  "parseSingle" in {
     val in = """<rating xmlns="http://schemas.google.com/g/2005">
                     <name xmlns="testing-uri">name</name>
@@ -130,17 +120,15 @@ class NestedTest  extends PicklerAsserts{
      val result = Nested.pickler(Single.pickler).unpickle(LinearStore(in))
      
       result match {
-      case Success(v, _) => Nested("name",Single("tagged"),Nil) must beEqualTo(v)
-      case f: NoSuccess  => fail(f toString)
+         case Success(v, _) => Nested("name",Single("tagged"),Nil) must beEqualTo(v)
+         case f: NoSuccess  => fail(f toString)
     }
 }
  
-
    "unparseInternal" in {
- val r=  Nested("name",pInternal,Internal("l1",111)::Nil)
+      val r = Nested("name",pInternal,Internal("l1",111)::Nil)
     
-  
-    val xml=   Nested.pickler(Internal.internalPickler).pickle(r)
+      val xml = Nested.pickler(Internal.internalPickler).pickle(r)
     """<rating xmlns="http://schemas.google.com/g/2005">
 <name xmlns="testing-uri">name</name>
 <internal xmlns="nested-uri">
@@ -153,14 +141,12 @@ class NestedTest  extends PicklerAsserts{
 </internal>
 </rating>
 """ must beEqualTo(normalize(xml.document))
-
   }
 
  "unparseContained" in {
- val r=  Nested("name",pContained,Contained("l1",111)::Nil)
+    val r = Nested("name",pContained,Contained("l1",111)::Nil)
     
-  
-    val xml=   Nested.pickler(Contained.pickler).pickle(r)
+    val xml = Nested.pickler(Contained.pickler).pickle(r)
     """<rating xmlns="http://schemas.google.com/g/2005">
 <name xmlns="testing-uri">name</name>
 <tag xmlns="contained-uri">tagged</tag>
@@ -169,24 +155,18 @@ class NestedTest  extends PicklerAsserts{
 <value xmlns="contained-uri">111</value>
 </rating>
 """ must beEqualTo(normalize(xml.document))
-
   }
 
 "unparseSingle" in {
- val r=  Nested("name",Single("xx"),Single("l1")::Nil)
+    val r = Nested("name",Single("xx"),Single("l1")::Nil)
     
-  
-    val xml=   Nested.pickler(Single.pickler).pickle(r)
+    val xml = Nested.pickler(Single.pickler).pickle(r)
     """<rating xmlns="http://schemas.google.com/g/2005">
 <name xmlns="testing-uri">name</name>
 <tag xmlns="contained-uri">xx</tag>
 <tag xmlns="contained-uri">l1</tag>
 </rating>
 """ must beEqualTo(normalize(xml.document))
-
   }
-
-
-  
 
 }
