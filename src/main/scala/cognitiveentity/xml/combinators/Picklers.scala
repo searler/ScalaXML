@@ -218,14 +218,14 @@ object Picklers extends AnyRef with TupleToPairFunctions {
   }
 
   /** A basic pickler that serializes an integer value to a string and back. */
-  def intVal: Pickler[Int] = typedValue(IntConvert)
+  def intVal = typedValue[Int]
   
   /**
    * A basic pickler for boolean values. Everything equal to the string 'true' is
    * unpickled to the boolean value <code>true</code>, everything else to <code>false</code>.
    * It is not case sensitive.
    */
-  def boolVal: Pickler[Boolean] = typedValue(BooleanConvert)
+  def boolVal = typedValue[Boolean]
   
   /**
    * A basic pickler for floating point values. It accepts double values as specified by the
@@ -233,7 +233,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
    * 
    * @see java.lang.Double.valueOf for the exact grammar.
    */
-  def doubleVal: Pickler[Double] =  typedValue(DoubleConvert)
+  def doubleVal = typedValue[Double]
   
   
 
