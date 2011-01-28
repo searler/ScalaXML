@@ -26,7 +26,11 @@ package cognitiveentity.xml.combinators
  *
  * Represents a URI
  *
+ * Primarily exists to allow implicit value w/o potential conflict
+ * with other implicit usages
+ *
  */
 case class URI(uri:String,prefix:String=null)
   
 
+object NURI extends URI(null)

@@ -46,7 +46,7 @@ object SimpleMapContainer {
   private final val TURI = URI("testing-uri")
   private def rawPickler  = 
     elem("container", 
-      elem("name",text)(TURI)  ~ map(keyOnly(elem(TURI, "key", text), MapContained.pickler))
+      elem("name",text)(TURI)  ~ map(twice(elem(TURI, "key", text), MapContained.pickler))
         )(TURI)
   
    def pickler: Pickler[SimpleMapContainer] = wrapCaseClass(rawPickler) (SimpleMapContainer.apply) (SimpleMapContainer.unapply)

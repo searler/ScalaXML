@@ -32,13 +32,14 @@ import org.specs._
  * This class tests simple XML pickler combinators.
  *
  * @author Iulian Dragos (iuliandragos@google.com) 
+ * @author Richard Searle
  */
 
 object PicklerTest extends  PicklerAsserts{
   import Picklers._
-  
-  final val TURI = URI("testing-uri")
 
+  final val TURI = URI("testing-uri")
+   
   def pAttr2 = 
     elem(TURI, "pair" , attr("a",text) ~ attr("b",text) )
 
@@ -94,6 +95,11 @@ def pUnpicklePartial:PartialFunction[String, St =>PicklerResult[String~String]] 
   def pSeq2 = 
     elem(TURI, "pair", 
         elem(TURI, "a", text) ~ elem(TURI, "b", text))
+
+  def pSeqNoNS2 = 
+    elem(NURI, "pair", 
+        elem(NURI, "a", text) ~ elem(NURI, "b", text))
+
 def pXml = 
     xml(TURI, "pair")
 
@@ -107,7 +113,7 @@ def pSetSeq2 =
 
  def pMapSeq2 = 
     elem(TURI, "pair", 
-        map(keyOnly(elem(TURI, "a", text),elem(TURI, "a", text) ~ elem(TURI, "b", text))))
+        map(twice(elem(TURI, "a", text),elem(TURI, "a", text) ~ elem(TURI, "b", text))))
 
  def pSeq2Start : Pickler[String ~ String] = 
     elem(TURI, "pair", 
@@ -160,6 +166,13 @@ val inExtract =
           
   val input =
     """<pair xmlns="testing-uri">
+<a>alfa</a>
+<b>omega</b>
+</pair>
+"""
+
+val inputNoNS =
+    """<pair>
 <a>alfa</a>
 <b>omega</b>
 </pair>
@@ -287,7 +300,9 @@ val attrInputTURI =
   val pairSetTwo = Set(new ~("alfa", "omega"), new ~("delta","gamma"))
   
  
-
+"testSequenceNoNSUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pair, inputNoNS, pSeqNoNS2)
+  }
 
  "testAttrTURIUnpickle" in {
      assertSucceedsWith("Attribute unpickling failed", pair, attrInputTURI , pAttr2TURI)

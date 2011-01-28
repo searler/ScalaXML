@@ -326,6 +326,10 @@ object Picklers extends AnyRef with TupleToPairFunctions {
   }
 
 
+  /**
+   * Silently consumes the element when unpickling
+   * and no-op when pickling.
+   */
    def ignore(uri:URI, label: String) = new Pickler[Unit] {
     def pickle(v: Unit, in: XmlOutputStore): XmlOutputStore = {
       in
@@ -340,17 +344,13 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     }
   }
 
-  
-  /** 
-   * Convenience method for creating an element with an implicit namepace. Contents of
-   * this element are committed (this parser is not allowed to recover from failures in
-   * parsing its content.
+
+  /**
+   * Pickle an DOM subtree as an Element.
+   * Can be used to provide extensibility at the cost of dealing
+   * with the standard Java DOM.
    */
-  def elem[A](label: String, pa: => Pickler[A])(implicit uri:URI): Pickler[A] =
-    elem(uri, label, commit(pa))
-
-
- def xml(uri:URI, label: String) = new Pickler[org.w3c.dom.Element] {
+  def xml(uri:URI, label: String) = new Pickler[org.w3c.dom.Element] {
     def pickle(v: org.w3c.dom.Element, in: XmlOutputStore): XmlOutputStore = {
       in.importElement(v)
       in
@@ -364,6 +364,23 @@ object Picklers extends AnyRef with TupleToPairFunctions {
       }
     }
   }
+
+  
+  /** 
+   * Convenience method for creating an element with an implicit namepace. Contents of
+   * this element are committed (this parser is not allowed to recover from failures in
+   * parsing its content.
+   */
+  def elem[A](label: String, pa: => Pickler[A])(implicit uri:URI): Pickler[A] =
+    elem(uri, label, commit(pa))
+ 
+  def elem[A](uri:URI, label: String)(implicit tc:Convert[A]):Pickler[A] =
+    elem(uri,label,typedValue(tc))
+ 
+   def elem[A](label: String)(implicit uri:URI,tc:Convert[A]):Pickler[A] =
+    elem(uri,label,typedValue(tc))
+
+
 
   /** Wrap a pickler into an element. */
   def elem[A](uri:URI, label: String, pa: => Pickler[A]) = new Pickler[A] {
@@ -505,7 +522,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
       pa.unpickle(in) andThen {(v, in1) => Success(Some(v), in1) } orElse Success(None, in)
   }
   
-  /** A repetition pickler. It applies 'pa' until there it fails. */
+  /** A repetition pickler, returning a List of matched values. It applies 'pa' until there it fails. */
   def list[A](pa: => Pickler[A]): Pickler[List[A]] = new Pickler[List[A]] {
     def pickle(vs: List[A], in: XmlOutputStore): XmlOutputStore = vs match {
       case v :: vs => pickle(vs, pa.pickle(v, in))
@@ -525,23 +542,9 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     }
   }
 
-  def keyOnly[A,B](pa: => Pickler[A], pb: => Pickler[B]):Pickler[(A,B)] = new Pickler[(A,B)]{
-    def pickle(v: (A,B),in:XmlOutputStore): XmlOutputStore = {
-       pb.pickle(v._2,in)
-    }
-    def unpickle(in: St):PicklerResult[(A,B)] = {
-      pa.unpickle(in) match {
-         case Success(va,_) => {
-           pb.unpickle(in) match {
-              case Success(vb,in2) => Success((va,vb),in2)
-              case f: NoSuccess => f
-           }    
-         }
-         case f: NoSuccess => f
-      } 
-    }
-  }
-
+ /**
+  * A repetition pickler, returning a Set of matched values.
+  */
  def set[A](pa: => Pickler[A]): Pickler[Set[A]] = new Pickler[Set[A]] {
     def pickle(vs: Set[A], in: XmlOutputStore): XmlOutputStore = {
       if(vs.isEmpty)
@@ -565,8 +568,32 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     }
   }
 
+  /**
+   * Apply pb iff pa succeeds, with the same input, returning a tuple2.
+   * This pickler is used for creating maps where the key must also form part of the value.
+   * It is thus necessary to unpickle twice, once to get the key and once to get the same data
+   * for the value. This is inefficient if same unpickler is used in each case, which would
+   * generally be the case.
+   * Only pb is used when pickling. i.e. pb must be a subset of pa.
+   */
+  def twice[A,B](pa: => Pickler[A], pb: => Pickler[B]):Pickler[(A,B)] = new Pickler[(A,B)]{
+    def pickle(v: (A,B),in:XmlOutputStore): XmlOutputStore = {
+       pb.pickle(v._2,in)
+    }
+    def unpickle(in: St):PicklerResult[(A,B)] = {
+      pa.unpickle(in) match {
+         case Success(va,_) => {
+           pb.unpickle(in) match {
+              case Success(vb,in2) => Success((va,vb),in2)
+              case f: NoSuccess => f
+           }    
+         }
+         case f: NoSuccess => f
+      } 
+    }
+  }
 
-
+ 
   def map[A,B](pa: => Pickler[(A,B)]): Pickler[Map[A,B]] = new Pickler[Map[A,B]] {
     def pickle(vs: Map[A,B], in: XmlOutputStore): XmlOutputStore = {
       if(vs.isEmpty)
@@ -600,9 +627,6 @@ object Picklers extends AnyRef with TupleToPairFunctions {
      }
   }
 
-  
- 
-
   /** Wrap a pair of functions around a given pickler */
   def wrap[A, B](pb: => Pickler[B])(g: B => A)(f: A => B): Pickler[A] = new Pickler[A] {
     def pickle(v: A, in: XmlOutputStore): XmlOutputStore = 
@@ -615,15 +639,9 @@ object Picklers extends AnyRef with TupleToPairFunctions {
       }
   }
 
-
   def wrapCaseClass[A, B](pa: => Pickler[A])(f: A => B)(g: B => Some[A]): Pickler[B] =
     wrap(pa) (f) { x => g(x).get }
 
-  
-  
-  
-  
-  
   /** A logging combinator */
   def logged[A](name: String, pa: => Pickler[A]): Pickler[A] = new Pickler[A] {
     def pickle(v: A, in: XmlOutputStore): XmlOutputStore = {

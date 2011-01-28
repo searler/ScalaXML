@@ -45,6 +45,11 @@ class EnumConvert[E <: Enum[E]](c:Class[E]) extends Convert[E]{
  */
 object Converters{
 
+  implicit object  StringConvert extends Convert[String] {   
+    def parse(s:String) =  s
+    def unparse(v:String) = v
+   }
+
   implicit object  IntConvert extends Convert[Int] {   
     def parse(s:String) =  s toInt 
     def unparse(v:Int) = v toString
@@ -65,8 +70,5 @@ object Converters{
     def unparse(v:Boolean) = v toString
    }
 
-   implicit object  StringConvert extends Convert[String] {   
-    def parse(s:String) =  s
-    def unparse(v:String) = v
-   }
+  
 }
