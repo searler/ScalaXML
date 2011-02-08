@@ -54,19 +54,19 @@ trait TupleToPairFunctions {
     case a ~ b ~ c ~ d =>  fun(a, b, c, d)
   }
 
-  /** Convert a function of 4 arguments to one that takes a pair of a pair. */
+  /** Convert a function of 5 arguments to one that takes a pair of a pair. */
   implicit def fun5ToPpairL[A, B, C, D, E, F]
       (fun: (A, B, C, D, E) => F): (A ~ B ~ C ~ D ~ E) => F = { 
     case a ~ b ~ c ~ d ~ e =>  fun(a, b, c, d, e)
   }
 
-  /** Convert a function of 4 arguments to one that takes a pair of a pair. */
+  /** Convert a function of 6 arguments to one that takes a pair of a pair. */
   implicit def fun6ToPpairL[A, B, C, D, E, F, G]
       (fun: (A, B, C, D, E, F) => G): (A ~ B ~ C ~ D ~ E ~ F) => G = { 
     case a ~ b ~ c ~ d ~ e ~ f =>  fun(a, b, c, d, e, f)
   }
 
-  /** Convert a function of 4 arguments to one that takes a pair of a pair. */
+  /** Convert a function of 7 arguments to one that takes a pair of a pair. */
   implicit def fun7ToPpairL[A, B, C, D, E, F, G, H]
       (fun: (A, B, C, D, E, F, G) => H): (A ~ B ~ C ~ D ~ E ~ F ~ G) => H = { 
     case a ~ b ~ c ~ d ~ e ~ f ~ g =>  fun(a, b, c, d, e, f, g)

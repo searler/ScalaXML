@@ -593,7 +593,30 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     }
   }
 
- 
+   /** Sequential composition of two picklers, returning a tuple2 from pa and pa~pb.
+    *  Useful when creating a map with key->key+value.
+    * Similar semantics to twice, but avoids the repeated unpickle of the key.
+    */
+  def join[A, B](pa: => Pickler[A], pb: => Pickler[B]): Pickler[(A,~[A, B])] =  new Pickler[(A,~[A, B])] {
+    def pickle(v:(A, A ~ B), in: XmlOutputStore): XmlOutputStore = 
+      pb.pickle(v._2._2, pa.pickle(v._1, in))
+    
+    def unpickle(in: St): PicklerResult[(A,~[A, B])] = {
+      pa.unpickle(in) match {
+        case Success(va, in1) =>
+          pb.unpickle(in1) match {
+            case Success(vb, in2) => Success(va -> new ~(va, vb), in2)
+            case f: NoSuccess     => f
+          }
+        case f: NoSuccess => f
+      }
+    }
+  }
+
+  /**
+   * Unpickle a map, given a pickler that returns a tuple2 of key and value.
+   * The twice and join picklers can be used to create that tuple2.
+   */
   def map[A,B](pa: => Pickler[(A,B)]): Pickler[Map[A,B]] = new Pickler[Map[A,B]] {
     def pickle(vs: Map[A,B], in: XmlOutputStore): XmlOutputStore = {
       if(vs.isEmpty)

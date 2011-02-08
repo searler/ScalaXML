@@ -62,20 +62,27 @@ object PicklerTest extends  PicklerAsserts{
  def pExtract = elem("strings", 
         elem(TURI,"str", attr("kind", text)))(TURI)
 
-  def cd = elem(TURI, "str" ,elem(TURI, "c", text) ~ elem(TURI, "d", text))
+  // --- switch -- 
+  /**
+   * Unpickle a~b OR c~d, depending on the value of the kind attribute of the str element
+   * 
+   */
+  def cd = elem(TURI, "str" ,elem(TURI, "c", intVal) ~ elem(TURI, "d", text))
   def ab =  elem(TURI, "str" ,elem(TURI, "a", text) ~ elem(TURI, "b", text))
-
-def pPicklePartial:PartialFunction[String~String,XmlOutputStore=>XmlOutputStore] =  {
-           case v => cd.pickle(v,_)
+  def pPicklePartial:PartialFunction[_~String,XmlOutputStore=>XmlOutputStore] =  {
+           case cognitiveentity.xml.combinators.~(a:String,b:String) => ab.pickle(new ~(a,b),_)
+           case cognitiveentity.xml.combinators.~(c:Int,d:String)  => cd.pickle(new ~(c,d),_)
+           case v:cognitiveentity.xml.combinators.~[String,String] => ab.pickle(v,_)
+           case v:cognitiveentity.xml.combinators.~[Int,String] => cd.pickle(v,_)
          }
-def pUnpicklePartial:PartialFunction[String, St =>PicklerResult[String~String]] = {
+  def pUnpicklePartial:PartialFunction[Any, St =>PicklerResult[Any~String]] = {
            case "cd" => cd.unpickle
-           case "ab" => ab.unpickle
-           
+           case "ab" => ab.unpickle         
          }  
  def pSwitch = elem("strings",
          switch(elem(TURI,"str", attr("kind", text)), pUnpicklePartial, pPicklePartial)
          )(TURI)
+ // --- switch ---
 
    def pWhen = elem("strings", 
       ((when(elem(TURI,"str", const(attr("kind", text), "special")), elem(TURI,"str", text)) |
@@ -115,6 +122,10 @@ def pSetSeq2 =
     elem(TURI, "pair", 
         map(twice(elem(TURI, "a", text),elem(TURI, "a", text) ~ elem(TURI, "b", text))))
 
+  def pMapJoin2 = 
+    elem(TURI, "pair", 
+        map(join(elem(TURI, "a", text),elem(TURI, "b", text))))
+
  def pSeq2Start : Pickler[String ~ String] = 
     elem(TURI, "pair", 
         ignore(TURI,"x") ~> elem(TURI, "a", text)   ~ elem(TURI, "b", text)) 
@@ -133,6 +144,14 @@ def pSetSeq2 =
         elem(TURI, "a", text) ~ elem(TURI, "b", typedValue))
 
  def pSeq2FloatType: Pickler[String ~ Float] = 
+    elem(TURI, "pair", 
+        elem(TURI, "a", text) ~ elem(TURI, "b", typedValue))
+
+def pSeq2DoubleType: Pickler[String ~ Double] = 
+    elem(TURI, "pair", 
+        elem(TURI, "a", text) ~ elem(TURI, "b", typedValue))
+
+def pSeq2BooleanType: Pickler[String ~ Boolean] = 
     elem(TURI, "pair", 
         elem(TURI, "a", text) ~ elem(TURI, "b", typedValue))
 
@@ -260,6 +279,13 @@ val inputInt =
 </pair>
 """
 
+val inputBoolean =
+    """<pair xmlns="testing-uri">
+<a>alfa</a>
+<b>true</b>
+</pair>
+"""
+
 
 
 val inputFloat =
@@ -289,6 +315,8 @@ val attrInputTURI =
   val pairString: ~[String,String] = new ~("alfa", "omega")
   val pairInt = new ~("alfa", 12)
   val pairFloat = new ~("alfa", 12.34F)
+  val pairDouble = new ~("alfa", 12.34)
+  val pairBoolean = new ~("alfa",true)
   val pairOptNone = new ~("alfa",None)
   val pairOptSome = new ~("alfa",Some("omega"))
   val pairNestedSeq = (new ~("alfa", "omega")) ~ (new ~("beta", "phi"))
@@ -354,8 +382,18 @@ val attrInputTURI =
        normalize(input) must beEqualTo(normalize(pickled))
  }
 
+"testMapJoinPickle" in  {
+ val pickled = pMapJoin2.pickle(pairMapSingle)
+       normalize(input) must beEqualTo(normalize(pickled))
+ }
+
 "testMapTwoSequencePickle" in  {
  val pickled = pMapSeq2.pickle(pairMapTwo)
+       normalize(inputMultiple) must beEqualTo(normalize(pickled))
+ }
+
+"testMapTwoJoinPickle" in  {
+ val pickled = pMapJoin2.pickle(pairMapTwo)
        normalize(inputMultiple) must beEqualTo(normalize(pickled))
  }
 
@@ -475,6 +513,10 @@ val attrInputTURI =
     assertSucceedsWith("Sequence unpickling failed", pairListTwo, inputMultiple, pListSeq2)
   }
 
+"testMapJoinUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairMapSingle, input, pMapJoin2)
+  }
+
 "testSetTwoUnpickle" in  {
     assertSucceedsWith("Sequence unpickling failed", pairSetTwo, inputMultiple, pSetSeq2)
   }
@@ -485,6 +527,10 @@ val attrInputTURI =
 
 "testMapTwoSequenceUnpickle" in  {
     assertSucceedsWith("Sequence unpickling failed", pairMapTwo, inputMultiple, pMapSeq2)
+  }
+
+"testMapTwoJoinUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairMapTwo, inputMultiple, pMapJoin2)
   }
 
 "testSequenceSkipUnpickle" in  {
@@ -525,6 +571,14 @@ val attrInputTURI =
 
  "testSequenceFloatTypeUnpickle" in  {
     assertSucceedsWith("Sequence unpickling failed", pairFloat, inputFloat, pSeq2FloatType)
+  }
+
+"testSequenceDoubleTypeUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairDouble, inputFloat, pSeq2DoubleType)
+  }
+
+"testSequenceBooleanTypeUnpickle" in  {
+    assertSucceedsWith("Sequence unpickling failed", pairBoolean, inputBoolean, pSeq2BooleanType)
   }
 
 "testSequenceStringTypeUnpickle" in  {
@@ -640,7 +694,7 @@ val attrInputTURI =
   }
 
 
-   "testSwitchAB" in {
+   "testSwitchABUnpickle" in {
     val in =
       """<p:strings xmlns:p="testing-uri">
 <p:str kind="ab">
@@ -651,21 +705,38 @@ val attrInputTURI =
 """    
     
     val expected = new ~("a", "b") 
-    assertSucceedsWith("Unpickling when", expected, in, pSwitch)
+    assertSucceedsWith("Unpickling switch AB", expected, in, pSwitch)
   }
 
-"testSwitchCD" in {
+"testSwitchCDUnpickle" in {
     val in =
       """<p:strings xmlns:p="testing-uri">
 <p:str kind="cd">
-<p:c>c</p:c>
+<p:c>12</p:c>
 <p:d>d</p:d>
 </p:str>
 </p:strings>
 """    
     
-    val expected = new ~("c", "d") 
-    assertSucceedsWith("Unpickling when", expected, in, pSwitch)
+    val expected = new ~(12, "d") 
+    assertSucceedsWith("Unpickling switch CD", expected, in, pSwitch)
+  }
+
+
+  "testSwitchCDPickle" in {
+    // TODO no kind
+    val in =
+      """<strings xmlns="testing-uri">
+<str>
+<c>12</c>
+<d>d</d>
+</str>
+</strings>
+"""    
+    
+    val expected = new ~(12, "d") 
+    val pickled = pSwitch.pickle(expected)
+    normalize(in) must beEqualTo( normalize(pickled))
   }
 
    "testWhen" in {

@@ -14,10 +14,12 @@
  */
 
 import sbt._
+import reaktor.scct.ScctProject
+
 /**
  * @author Richard Searle
  */
-class ScalaXMLProject(info: ProjectInfo) extends DefaultProject(info)
+class ScalaXMLProject(info: ProjectInfo) extends DefaultProject(info) with ScctProject
 {
  val specs = "org.scala-tools.testing" % "specs_2.8.1" % "1.6.6"
 
