@@ -29,16 +29,11 @@ class XPath[T](s:String)(implicit tc:Convert[T],implicit val nsc:Context = new C
   def apply(s:String):T = get(s).get
   def get(s:String):Option[T] = unapply(s)
   def unapply(s:String):Option[T] =  {
-    try{
       val ns= (expr.evaluate(new InputSource(new StringReader(s)),XPathConstants.NODESET)).asInstanceOf[org.w3c.dom.NodeList]
       if(ns.getLength == 0)
 	None
 	else  
 	  Some(tc.convert(ns))
-    }catch{
-      case t @ _ => SimplerLogger("unapply",t)
-      None
-    }
   }
   
   
@@ -50,13 +45,8 @@ class XPathPrimitive[T](s:String)(implicit tc:Convert[T],implicit val nsc:Contex
    def apply(s:String):T = get(s).get
    def get(s:String):Option[T] = unapply(s)
    def unapply(s:String):Option[T] =  {
-    try{
       val vs= (expr.evaluate(new InputSource(new StringReader(s)),tc.primitiveType))
       Some(tc.convert(vs))
-    }catch{
-      case t @ _ => SimplerLogger("primitive unapply",t)
-      None
-    }
   }
   
   
@@ -67,14 +57,9 @@ object XPath {
    
   val xpath =  XPathFactory.newInstance().newXPath() 
   def compile(s:String,nsc:Context,fun:FunctionResolver,variables:VariableResolver) = { 
-    try{
     xpath.setNamespaceContext(nsc)
     xpath.setXPathVariableResolver(variables)
     xpath.setXPathFunctionResolver(fun) 
     xpath.compile(s)
-    }
-    catch {
-     case t @ _ => { SimplerLogger("compile",t);  throw t}
-  }  
   }
 }

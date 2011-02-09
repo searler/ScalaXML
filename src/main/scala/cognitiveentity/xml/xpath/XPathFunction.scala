@@ -68,12 +68,8 @@ class Wrapper[T](val value:T) extends org.w3c.dom.NodeList with org.w3c.dom.Node
 trait Arity extends XPathFunction {
   
   def arity:Int
-  def to[T:Convert](args:java.util.List[_],index:Int):T =  try { 
+  def to[T:Convert](args:java.util.List[_],index:Int):T =  
     implicitly[Convert[T]].convert(args.get(index))
-  } catch {
-     case t @ _ => { SimplerLogger("convert",t);  throw t}
-  }  
-  
 }
 
 trait Convert[T] {
