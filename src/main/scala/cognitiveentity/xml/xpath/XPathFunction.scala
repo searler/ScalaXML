@@ -27,10 +27,6 @@ object NullList extends org.w3c.dom.NodeList{
    def item(index:Int):org.w3c.dom.Node = null
 }
 
-class SingletonList(node:org.w3c.dom.Node) extends org.w3c.dom.NodeList{
-   def getLength = 1
-   def item(index:Int):org.w3c.dom.Node = node
-}
 
 class Wrapper[T](val value:T) extends org.w3c.dom.NodeList with org.w3c.dom.Node {
   import  org.w3c.dom._
@@ -39,7 +35,7 @@ class Wrapper[T](val value:T) extends org.w3c.dom.NodeList with org.w3c.dom.Node
    def appendChild(newChild:Node):Node = null
    def cloneNode(deep:Boolean):Node = this
    def getAttributes():NamedNodeMap = null
-   def getChildNodes():NodeList = new SingletonList(this)
+   def getChildNodes():NodeList = null
    def getFirstChild():Node = this
    def getLastChild():Node = this
    def getLocalName() = ""
