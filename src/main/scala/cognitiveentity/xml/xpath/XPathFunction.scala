@@ -21,13 +21,6 @@ package cognitiveentity.xml.xpath
 import javax.xml.xpath._
 import javax.xml.namespace.QName
 
-
-object NullList extends org.w3c.dom.NodeList{
-   def getLength = 0
-   def item(index:Int):org.w3c.dom.Node = null
-}
-
-
 class Wrapper[T](val value:T) extends org.w3c.dom.NodeList with org.w3c.dom.Node {
   import  org.w3c.dom._
    def getLength = 1
