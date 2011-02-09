@@ -120,21 +120,14 @@ class LinearStore(ats: NamedNodeMap, nods: List[Node])
  * @author Iulian Dragos
  */
 object LinearStore {
- 
-  
-  /** Return an empty pickler state  */
-  def empty() = 
-    LinearStore(NullNamedNodeMap, Nil)
 
   /** Create a LinearStore with the given state.*/
   def apply(attrs: NamedNodeMap, nodes: Seq[Node]) = 
     new LinearStore(attrs, nodes.toList )
 
-  def apply(ns: List[Node]) =  new LinearStore(NullNamedNodeMap ,ns)
-  
-  def apply(store: XmlStore): XmlInputStore =
-    apply(store.attrs, store.nodes)
-
+  //represents list of attributes, which do not themselves have attributes
+  def apply(ns: List[Node]) =  new LinearStore(null ,ns)
+ 
   def apply(doc: Document): XmlInputStore = apply(doc.getDocumentElement)
 
   /** Create a LinearStore from an element. */
@@ -173,16 +166,6 @@ object LinearStore {
     buffer.toList
   }
 
-private object NullNamedNodeMap extends NamedNodeMap {
-  def getLength:Int  = 0
-  def getNamedItem(name:String) = null
-  def getNamedItemNS(uri:String,local:String) = null
-  def item(index:Int) = null
-  def removeNamedItem(name:String) = null
-  def removeNamedItemNS(uri:String,name:String) = null
-  def setNamedItem(arg:Node) = arg
-  def setNamedItemNS(arg:Node) = arg
-}
 
   
 }

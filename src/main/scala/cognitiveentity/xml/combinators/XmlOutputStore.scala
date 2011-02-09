@@ -61,10 +61,7 @@ trait XmlOutputStore{
   def document:Document
 }
 
-/**
- * A PlainOutputStore implements XmlOutputStore with reasonable efficiency. It
- * is a mutable representation.
- */
+
 class ElementOutputStore(val element:Element) extends XmlOutputStore {
 
   def document =element  getOwnerDocument
@@ -98,10 +95,6 @@ class ElementOutputStore(val element:Element) extends XmlOutputStore {
    
 }
 
-/**
- * A PlainOutputStore implements XmlOutputStore with reasonable efficiency. It
- * is a mutable representation.
- */
 class DocumentOutputStore(val document:Document) extends XmlOutputStore {
   def addText(s: String): XmlOutputStore =  throw new UnsupportedOperationException
   def addAttribute(uri:URI,key: String, value: String): XmlOutputStore =  throw new UnsupportedOperationException

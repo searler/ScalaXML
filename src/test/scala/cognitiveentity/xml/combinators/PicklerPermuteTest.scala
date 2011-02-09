@@ -208,4 +208,15 @@ class PicklerPermuteTest extends PicklerAsserts {
     assertSucceedsWith("Nested interleaved", triple, input, p1)
   }
 
+ "testNoMatch" in  {
+    val p1 = interleaved("set3", interleaved(elem("a", text)) ~ elem("b", text) ~ opt(elem("c", text)))
+    val input = 
+      """<p:set3 xmlns:p="testing-uri">
+        <p:a>alfa</p:a>
+        <p:b>beta</p:b>
+      </p:set3>"""
+
+    assertSucceedsWith("Nested interleaved",  new ~(new ~("alfa", "beta"), None) , input, p1)
+  }
+
 }

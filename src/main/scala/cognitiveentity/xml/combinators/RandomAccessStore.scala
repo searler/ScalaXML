@@ -71,8 +71,8 @@ class RandomAccessStore(myAttrs: NamedNodeMap, myNodes: Seq[Node],
         case e: Element if (e.getNamespaceURI == uri.uri) => 
           nodeMap.remove(label)
           return (Some(e), this)
-      case _ => ()
-    }
+        case _ => ()
+      }
     (None, this)
   }
   
