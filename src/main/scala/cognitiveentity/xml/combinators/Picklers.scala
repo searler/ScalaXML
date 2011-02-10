@@ -21,8 +21,6 @@
 
 package cognitiveentity.xml.combinators
 
-import cognitiveentity.xml.util.DateTime
-
 import java.text.ParseException
 import org.w3c.dom._
 import cognitiveentity.xml.combinators.Converters._
