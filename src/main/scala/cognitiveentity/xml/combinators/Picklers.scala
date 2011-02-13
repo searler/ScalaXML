@@ -78,9 +78,6 @@ object Picklers extends AnyRef with TupleToPairFunctions {
     /** Apply 'f' when this result is failure. */
     def orElse[B >: A](f: => PicklerResult[B]): PicklerResult[B]
     
-    /** Is this result a successful parse result? */
-    def isSuccessful: Boolean
-    
     /** Retrieve the result in case of success. */
     def get: A
   }
@@ -89,7 +86,6 @@ object Picklers extends AnyRef with TupleToPairFunctions {
   case class Success[+A](v: A, in: St) extends PicklerResult[A] {
     def andThen[B](f: (A, St) => PicklerResult[B]): PicklerResult[B] = f(v, in)
     def orElse[B >: A](f: => PicklerResult[B]): PicklerResult[B] = this
-    def isSuccessful = true
     def get = v
   }
 
@@ -103,7 +99,6 @@ object Picklers extends AnyRef with TupleToPairFunctions {
   abstract class NoSuccess(val msg: String, val in: St) extends PicklerResult[Nothing] {
     def andThen[B](f: (Nothing, St) => PicklerResult[B]) = this
     def orElse[B >: Nothing](f: => PicklerResult[B]): PicklerResult[B] = f
-    def isSuccessful = false
     def get = throw new NoSuchElementException("Unpickling failed.")
 
     val prefix: String
@@ -281,10 +276,7 @@ object Picklers extends AnyRef with TupleToPairFunctions {
       case Some(_) => true
       case None => false
     } (b => if (b) Some("") else None)
-  
-  /** Convenience method for creating an attribute within a namepace. */
-  def attr[A](label: String, pa: => Pickler[A], uri:URI): Pickler[A] =
-    attr(uri, label, pa)
+ 
 
   /**
    * Wrap a parser into a prefixed attribute. The attribute will contain all the 
