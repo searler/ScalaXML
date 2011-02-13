@@ -103,6 +103,14 @@ object PicklerTest extends  PicklerAsserts{
     elem(TURI, "pair", 
         elem(TURI, "a", text) ~ elem(TURI, "b", text))
 
+ def pSeqMarker2 = 
+    elem(TURI, "pair", 
+        elem(TURI, "a", text) ~ marker(elem(TURI, "b", text)))
+
+ def pSeq2Logged = 
+    elem(TURI, "pair", 
+        elem(TURI, "a", text) ~ logged("B",elem(TURI, "b", text)))
+
   def pSeqNoNS2 = 
     elem(NURI, "pair", 
         elem(NURI, "a", text) ~ elem(NURI, "b", text))
@@ -361,6 +369,21 @@ val attrInputTURI =
        normalize(input) must beEqualTo(normalize(pickled))
  }
 
+"testSequenceMarkerPickle" in  {
+ val pickled = pSeqMarker2.pickle(new ~("a",true))
+ val expected = """<pair xmlns="testing-uri">
+<a>a</a>
+<b/>
+</pair>
+"""
+       normalize(expected) must beEqualTo(normalize(pickled))
+ }
+
+"testSequenceLoggedPickle" in  {
+ val pickled = pSeq2Logged.pickle(pair)
+       normalize(input) must beEqualTo(normalize(pickled))
+ }
+
  "testListSequencePickle" in  {
  val pickled = pListSeq2.pickle(pairListSingle)
        normalize(input) must beEqualTo(normalize(pickled))
@@ -436,6 +459,10 @@ val attrInputTURI =
 
 "testMixedUnpickleText" in  {
     assertSucceedsWith("testMixedUnpickleText", "Mixed", mixed, pMixed)
+  }
+
+"testSeqMarker2" in  {
+    assertSucceedsWith("testMixedUnpickleText", new ~("alfa",true), input, pSeqMarker2)
   }
 
 "testMixedUnpickleElem" in  {
