@@ -72,15 +72,6 @@ trait TupleToPairFunctions {
     case a ~ b ~ c ~ d ~ e ~ f ~ g =>  fun(a, b, c, d, e, f, g)
   }
 
-  /** 
-   * Convert a function of 3 arguments to one that takes a pair of a pair, 
-   * right associative. 
-   */
-  implicit def fun3ToPpairR[A, B, C, D](f: (A, B, C) => D): (~[A, ~[B, C]]) => D = { 
-    case a ~ (b ~ c) =>  f(a, b, c)
-  } 
-
-
    implicit def bareUnapply[ B](a: Option[B]) = 
     Some(a.get)
   
