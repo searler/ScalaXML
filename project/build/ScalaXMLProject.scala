@@ -21,7 +21,7 @@ import reaktor.scct.ScctProject
  */
 class ScalaXMLProject(info: ProjectInfo) extends DefaultProject(info) with ScctProject
 {
- val specs = "org.scala-tools.testing" % "specs_2.8.1" % "1.6.6"
+ val specs = "org.scala-tools.testing" % "specs_2.8.1" % "1.6.7"
 
  override def compileOrder = CompileOrder.JavaThenScala
 
