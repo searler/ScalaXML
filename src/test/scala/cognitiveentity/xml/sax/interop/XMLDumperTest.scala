@@ -29,8 +29,7 @@ import scala.xml._
 
 object dumper extends Specification {
 
- sequential 
-  
+
   "complex" in {    
     val xml = <Outside> <Y xmlns="http://y"/> <X a="12" c="21" xmlns:h="http://com.com" xmlns:q="http://q"  >xxx &lt; <y xmlns:g="http://example.com"  h:b="13"/> </X> </Outside>
     """<Outside> <Y xmlns="http://y"></Y> <X c="21" a="12" xmlns:q="http://q" xmlns:h="http://com.com">xxx &lt; <y h:b="13" xmlns:g="http://example.com"></y> </X> </Outside>""" must beEqualTo (xml.toString)
