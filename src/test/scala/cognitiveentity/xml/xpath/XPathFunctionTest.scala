@@ -18,7 +18,7 @@
  */
 package cognitiveentity.xml.xpath
 
-import org.specs._
+import _root_.org.specs2.mutable._
 
 import javax.xml.xpath.XPathFunction
 import scala.collection.JavaConversions._

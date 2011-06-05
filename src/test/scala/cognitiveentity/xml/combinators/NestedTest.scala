@@ -14,7 +14,7 @@
  */
 package cognitiveentity.xml.combinators
 
-import org.specs._
+import _root_.org.specs2.mutable._
 
 
 
@@ -52,7 +52,7 @@ class NestedTest  extends PicklerAsserts{
      
          result match {
             case Success(v:Internal, _) =>pInternal must beEqualTo(v)
-            case f: NoSuccess  => fail(f toString)
+            case f: NoSuccess  => failure(f toString)
          }
    }
 
@@ -79,7 +79,7 @@ class NestedTest  extends PicklerAsserts{
      
       result match {
          case Success(v, _) => Nested("name",Internal("tagged",123),Nil) must beEqualTo(v)
-         case f: NoSuccess  => fail(f toString)
+         case f: NoSuccess  => failure(f toString)
        }
 }
 
@@ -89,7 +89,7 @@ class NestedTest  extends PicklerAsserts{
      
       result match {
          case Success(v, _) => pContained must beEqualTo(v)
-         case f: NoSuccess  => fail(f toString)
+         case f: NoSuccess  => failure(f toString)
     }
 }
 
@@ -107,7 +107,7 @@ class NestedTest  extends PicklerAsserts{
      
       result match {
          case Success(v, _) => Nested("name",Contained("tagged",123),Nil) must beEqualTo(v)
-         case f: NoSuccess  => fail(f toString)
+         case f: NoSuccess  => failure(f toString)
     }
 }
  
@@ -121,7 +121,7 @@ class NestedTest  extends PicklerAsserts{
      
       result match {
          case Success(v, _) => Nested("name",Single("tagged"),Nil) must beEqualTo(v)
-         case f: NoSuccess  => fail(f toString)
+         case f: NoSuccess  => failure(f toString)
     }
 }
  

@@ -18,16 +18,20 @@
  */
 package cognitiveentity.xml.xpath
 
-import org.specs._
+import _root_.org.specs2.mutable._
 
 
 
 object xpathTest extends Specification{
+
+  sequential 
   
   import cognitiveentity.xml.xpath.XPathFunctionDef._
   
    
    import cognitiveentity.xml.xpath.Converters._
+
+"The xpath" should {
   
   "match" in {
     val xp = new XPath[String]("/x/y")
@@ -173,7 +177,7 @@ object xpathTest extends Specification{
   "nomatch" in {
     val xp = new XPath[String]("/x/z")
     "<x><y>text</y></x>" match {
-      case xp(t) => fail 
+      case xp(t) => failure("") 
       case i @ _ => "<x><y>text</y></x>" must beEqualTo(i)  
     }
   }
@@ -198,7 +202,7 @@ object xpathTest extends Specification{
   "int nomatch" in {
     val xp = new XPath[Int]("/x/z")
     "<x><y>123</y></x>" match {
-       case xp(t) => fail 
+       case xp(t) => failure("")  
        case i @ _ => "<x><y>123</y></x>" must beEqualTo(i)   
     }
   }
@@ -218,7 +222,7 @@ object xpathTest extends Specification{
     val xp = new XPath[String]("pre:double(/x/y)")
     "<x><y>text</y></x>" match {
       case xp(t) => "texttext" must beEqualTo(t) 
-      case x @ _ => fail(x)
+      case x @ _ => failure(x)
     }
   }
   
@@ -272,6 +276,6 @@ object xpathTest extends Specification{
     }
   }
   
-   
+   }
   
 }

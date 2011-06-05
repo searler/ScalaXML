@@ -22,22 +22,11 @@
    
 package cognitiveentity.xml.combinators
 
-import org.specs._
+//cannot be placed inside Specification, due to conflicts with Specs2 implicits
+object definitions {
 
-
-
-
-
-/** 
- * This class tests simple XML pickler combinators.
- *
- * @author Iulian Dragos (iuliandragos@google.com) 
- * @author Richard Searle
- */
-
-object PicklerTest extends  PicklerAsserts{
-  import Picklers._
-
+   import Picklers._
+  
   final val TURI = URI("testing-uri")
    
   def pAttr2 = 
@@ -174,6 +163,22 @@ def pSeq2BooleanType: Pickler[String ~ Boolean] =
  def pSeq2Default: Pickler[String ~ String] = 
     elem(TURI, "pair", 
         elem(TURI, "a", text)  ~ default(elem(TURI,"b",text),"omega"))
+}
+
+import _root_.org.specs2.mutable._
+
+
+/** 
+ * This class tests simple XML pickler combinators.
+ *
+ * @author Iulian Dragos (iuliandragos@google.com) 
+ * @author Richard Searle
+ */
+
+object PicklerTest extends  PicklerAsserts{
+  
+import definitions._
+import Picklers._
 
 
 val inExtract =
@@ -335,6 +340,8 @@ val attrInputTURI =
   val pairMapTwo = Map("alfa"->new ~("alfa", "omega"),"delta"->new ~("delta", "gamma"))
   val pairSetTwo = Set(new ~("alfa", "omega"), new ~("delta","gamma"))
   
+
+"Picklers " should {
  
 "testSequenceNoNSUnpickle" in  {
     assertSucceedsWith("Sequence unpickling failed", pair, inputNoNS, pSeqNoNS2)
@@ -491,7 +498,7 @@ val attrInputTURI =
 """))
     result match {
       case Success(v:org.w3c.dom.Element, _) =>  "\nalfa\nomega\n" must beEqualTo( v.getTextContent)
-      case f: NoSuccess  =>  fail(f.toString)
+      case f: NoSuccess  =>  failure(f.toString)
     }
      val pickled = pXml.pickle(result.get)
        normalize(input) must beEqualTo(normalize(pickled))
@@ -807,7 +814,7 @@ val attrInputTURI =
     assertSucceedsWith("Unpickling when", expected, input, pickler)
   }
  
- 
+ }
   
 
 }

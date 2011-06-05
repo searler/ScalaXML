@@ -20,7 +20,7 @@
 */
 package cognitiveentity.xml.combinators
 
-import org.specs._
+import _root_.org.specs2.mutable._
 import Picklers._
 
 /**
@@ -40,7 +40,7 @@ class RatingTest  extends PicklerAsserts{
      
         result match {
             case Success(v, _) => Rating("name",9,12,14,12::23::Nil) must beEqualTo(v)
-            case f: NoSuccess  => fail(f toString)
+            case f: NoSuccess  => failure(f toString)
         }
    }
 
@@ -56,7 +56,7 @@ class RatingTest  extends PicklerAsserts{
      
       result match {
          case Success(v, _) => Rating("name",9,13,666,12::23::Nil) must beEqualTo(v)
-         case f: NoSuccess  => fail(f toString)
+         case f: NoSuccess  => failure(f toString)
     }
   }
 

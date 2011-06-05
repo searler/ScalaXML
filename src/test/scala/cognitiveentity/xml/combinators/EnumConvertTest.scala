@@ -14,7 +14,7 @@
  */
 package cognitiveentity.xml.combinators
 
-import org.specs._
+import _root_.org.specs2.mutable._
 
 import Picklers._
 
@@ -42,7 +42,7 @@ object EnumConvertTest extends PicklerAsserts{
      
       result match {
          case Success(v, _) => EnumContainer("name",TestEnum.BETA) must beEqualTo(v)
-         case f: NoSuccess  => fail(f toString)
+         case f: NoSuccess  => failure(f toString)
       }
    }
 }

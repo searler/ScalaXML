@@ -20,7 +20,7 @@ package cognitiveentity.xml.xpath
 
 import javax.xml.XMLConstants
 
-import org.specs._
+import _root_.org.specs2.mutable._
 
 object nameSpaceTest extends Specification {
   

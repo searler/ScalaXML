@@ -22,7 +22,7 @@
 
 package cognitiveentity.xml.combinators;
 
-import org.specs._
+import _root_.org.specs2.mutable._
 
 /**
  * Test permutation parsers.

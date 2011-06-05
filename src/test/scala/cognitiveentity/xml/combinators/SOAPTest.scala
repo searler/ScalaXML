@@ -15,7 +15,7 @@
  */
 package cognitiveentity.xml.combinators
 
-import org.specs._
+import _root_.org.specs2.mutable._
 
 import scala.xml.PrettyPrinter
 
@@ -148,13 +148,15 @@ class SOAPTest  extends PicklerAsserts{
  
   //Fault w/o details 
   val pFaultUnit = Fault[Unit](Sender,Some("m:MessageTimeout"),List("Sender Timeout","Besender tuid"),None,None,None)
+
+ "SOAP Test" should {
   
    "parseFaultUnit" in {
       val result = Fault.pickler(null).unpickle(inFaultUnit)
      
       result match {
          case Success(v, _) => pFaultUnit must beEqualTo(v)
-         case f: NoSuccess  => fail(f toString)
+         case f: NoSuccess  => failure(f toString)
     }
 }      
   
@@ -163,7 +165,7 @@ class SOAPTest  extends PicklerAsserts{
      
       result match {
          case Success(v, _) => pFault must beEqualTo(v)
-         case f: NoSuccess  => fail(f toString)
+         case f: NoSuccess  => failure(f toString)
       }
    }      
 
@@ -172,7 +174,7 @@ class SOAPTest  extends PicklerAsserts{
      
       result match {
          case Success(v, _) => pFaultString must beEqualTo(v)
-         case f: NoSuccess  => fail(f toString)
+         case f: NoSuccess  => failure(f toString)
       }
    }      
 
@@ -240,7 +242,7 @@ class SOAPTest  extends PicklerAsserts{
      
      result match {
       case Success(v, _) => DocLiteral(Internal("tagged",123)) must beEqualTo(v)
-      case f: NoSuccess  => fail(f toString)
+      case f: NoSuccess  => failure(f toString)
     }
  }
 
@@ -257,7 +259,7 @@ class SOAPTest  extends PicklerAsserts{
      
      result match {
         case Success(v, _) => DocLiteral(Contained("tagged",123)) must beEqualTo(v)
-        case f: NoSuccess  => fail(f toString)
+        case f: NoSuccess  => failure(f toString)
      }
   }
  
@@ -324,7 +326,7 @@ class SOAPTest  extends PicklerAsserts{
      
      result match {
         case Success(v, _) => DocLiteral(123) must beEqualTo(v)
-        case f: NoSuccess  => fail(f toString)
+        case f: NoSuccess  => failure(f toString)
      }
    } 
 
@@ -342,12 +344,13 @@ class SOAPTest  extends PicklerAsserts{
       import FaultCodeConvert._
       parse("env:xyz") must throwA(new scala.MatchError("xyz"))
    }
+}
 
    /**
     * Use standard Java SOAP implementation to ensure Scala code 
     * correctly serializes the XML representation
     */
-   private def checkBody(expected:String,xml:org.w3c.dom.Document){
+   private def checkBody(expected:String,xml:org.w3c.dom.Document) = {
      import javax.xml.soap._
      import java.io._
 
@@ -356,4 +359,5 @@ class SOAPTest  extends PicklerAsserts{
      expected must beEqualTo(message.getSOAPBody.getTextContent)
    }
       
+
 }

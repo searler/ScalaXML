@@ -21,7 +21,7 @@
 
 package cognitiveentity.xml.combinators;
 
-import org.specs._
+import _root_.org.specs2.mutable._
 
 import org.w3c.dom._
 
@@ -33,16 +33,16 @@ import org.w3c.dom._
 trait PicklerAsserts extends Specification {
   import Picklers._
    
-  def assertSucceedsWith[A](name: String, expected: A, in: String, pa: Pickler[A]) {
+  def assertSucceedsWith[A](name: String, expected: A, in: String, pa: Pickler[A]) = {
     val result = pa.unpickle(in)
     result match {
       case Success(v, _) =>  expected aka name must beEqualTo( v)
-      case f: NoSuccess  =>  fail(f.toString)
+      case f: NoSuccess  =>  failure(f.toString)
     }
   }
   
   /** Test that the value 'v' pickles to the expected xml node. */
-  def assertPicklesTo[A](name: String, expected: Node, v: A, pa: Pickler[A]) {
+  def assertPicklesTo[A](name: String, expected: Node, v: A, pa: Pickler[A]) = {
      val doc = pa.pickleDocument(v)
      expected aka name must beEqualTo(doc)
   }

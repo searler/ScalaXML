@@ -18,7 +18,7 @@
  */
 package cognitiveentity.xml.sax.interop
 
-import org.specs._
+import _root_.org.specs2.mutable._
 
 
 import java.io._

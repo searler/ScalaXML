@@ -15,7 +15,7 @@
 
 package cognitiveentity.xml.combinators
 
-import org.specs._
+import _root_.org.specs2.mutable._
 import scala.xml.PrettyPrinter
 import Picklers._
 
@@ -42,7 +42,7 @@ class MapContainedTest  extends PicklerAsserts{
      val result = SimpleMapContainer.pickler.unpickle(LinearStore(in))  
      result match {
          case Success(v, _) => value must beEqualTo(v)
-         case f: NoSuccess  => fail(f toString)
+         case f: NoSuccess  => failure(f toString)
      }
    }
  

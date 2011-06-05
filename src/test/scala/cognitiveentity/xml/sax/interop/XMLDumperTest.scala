@@ -18,7 +18,7 @@
  */
 package cognitiveentity.xml.sax.interop
 
-import org.specs._
+import _root_.org.specs2.mutable._
 
 import java.io._
 import javax.xml.parsers._
@@ -28,11 +28,14 @@ import javax.xml.transform.stream._
 import scala.xml._
 
 object dumper extends Specification {
+
+ sequential 
   
   "complex" in {    
     val xml = <Outside> <Y xmlns="http://y"/> <X a="12" c="21" xmlns:h="http://com.com" xmlns:q="http://q"  >xxx &lt; <y xmlns:g="http://example.com"  h:b="13"/> </X> </Outside>
-     """<Outside> <Y xmlns="http://y"></Y> <X a="12" c="21" xmlns:h="http://com.com" xmlns:q="http://q">xxx &lt; <y h:b="13" xmlns:g="http://example.com"></y> </X> </Outside>""" must beEqualTo (xml.toString)
-    """<?xml version="1.0" encoding="UTF-8"?><Outside> <Y xmlns="http://y"/> <X xmlns:h="http://com.com" xmlns:q="http://q" a="12" c="21">xxx &lt; <y xmlns:g="http://example.com" h:b="13"/> </X> </Outside>""" must beEqualTo (gen(xml))
+    """<Outside> <Y xmlns="http://y"></Y> <X c="21" a="12" xmlns:q="http://q" xmlns:h="http://com.com">xxx &lt; <y h:b="13" xmlns:g="http://example.com"></y> </X> </Outside>""" must beEqualTo (xml.toString)
+    """<?xml version="1.0" encoding="UTF-8"?><Outside> <Y xmlns="http://y"/> <X xmlns:q="http://q" xmlns:h="http://com.com" c="21" a="12">xxx &lt; <y xmlns:g="http://example.com" h:b="13"/> </X> </Outside>""" must beEqualTo (gen(xml))
+
   }
  
   "simple" in {
